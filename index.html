@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>معرض الفردوس</title>
 
 <style>
@@ -19,7 +19,7 @@
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:system-ui,Tahoma;
+  font-family:system-ui,Tahoma,Arial;
   background:var(--bg);
   color:var(--text);
 }
@@ -57,7 +57,7 @@ header{
   color:#fff;
 }
 
-/* ===== PRODUCTS ===== */
+/* ===== CONTENT ===== */
 .wrap{padding:12px}
 .grid{
   display:grid;
@@ -101,7 +101,7 @@ header{
 .btn{
   margin-top:8px;
   width:100%;
-  padding:8px;
+  padding:10px;
   border-radius:10px;
   border:none;
   background:var(--main);
@@ -142,7 +142,7 @@ header{
   cursor:pointer;
 }
 
-/* ===== CART BTN ===== */
+/* ===== CART ===== */
 .cart{
   position:fixed;
   bottom:16px;
@@ -179,31 +179,42 @@ header{
     <h2 id="dName"></h2>
     <p id="dDesc" style="color:var(--muted)"></p>
     <div class="price" id="dPrice"></div>
-    <button class="btn" onclick="add()">إضافة للسلة</button>
+    <button class="btn" onclick="addToCart()">إضافة للسلة</button>
   </div>
 </div>
 
 <script>
-const SHEET="https://docs.google.com/spreadsheets/d/e/2PACX-1vToXcV323xvYtiuz6tg-d0q_f2iwOwnYBpCRqAgSnarQ2PYVZ9Z1GJKlSmftjuajtlJ6zBfmVbRwArp/pub?output=csv";
-const WA="9647719183122";
+/* ===== SETTINGS ===== */
+const SHEET =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vToXcV323xvYtiuz6tg-d0q_f2iwOwnYBpCRqAgSnarQ2PYVZ9Z1GJKlSmftjuajtlJ6zBfmVbRwArp/pub?output=csv";
+const WHATSAPP = "9647719183122";
 
+/* ===== STATE ===== */
 let products=[],cart={},cat="",current=null;
 
-fetch(SHEET).then(r=>r.text()).then(t=>{
-  const l=t.trim().split(/\r?\n/);
-  const h=l[0].split(",");
-  products=l.slice(1).map(r=>{
+/* ===== LOAD DATA ===== */
+fetch(SHEET)
+.then(r=>r.text())
+.then(t=>{
+  const lines=t.trim().split(/\r?\n/);
+  const headers=lines[0].split(",");
+  products=lines.slice(1).map(r=>{
     const c=r.split(",");
-    let o={};h.forEach((x,i)=>o[x]=c[i]||"");
+    let o={};
+    headers.forEach((h,i)=>o[h]=c[i]||"");
     return o;
-  }).filter(p=>p.id&&p.name&&p.price);
-  drawCats();draw();
+  }).filter(p=>p.id && p.name && p.price);
+  drawCats();
+  draw();
 });
 
+/* ===== CATEGORIES ===== */
 function drawCats(){
   const cs=[...new Set(products.map(p=>p.category))];
   cats.innerHTML='<div class="active" onclick="setCat(\'\')">الكل</div>';
-  cs.forEach(x=>cats.innerHTML+=`<div onclick="setCat('${x}')">${x}</div>`);
+  cs.forEach(x=>{
+    cats.innerHTML+=`<div onclick="setCat('${x}')">${x}</div>`;
+  });
 }
 function setCat(x){
   cat=x;
@@ -212,43 +223,59 @@ function setCat(x){
   draw();
 }
 
+/* ===== PRODUCTS ===== */
 function draw(){
   grid.innerHTML="";
-  products.filter(p=>!cat||p.category==cat).forEach(p=>{
-    grid.innerHTML+=`
-    <div class="card">
-      <img src="${p.image}" onclick="openD('${p.id}')">
-      <div class="p">
-        <h4>${p.name}</h4>
-        <div class="price">${p.price} د.ع</div>
-        ${p.old_price&&p.old_price!=p.price?`<div class="old">${p.old_price}</div>`:""}
-        <button class="btn" onclick="openD('${p.id}')">عرض</button>
-      </div>
-    </div>`;
-  });
+  products
+    .filter(p=>!cat || p.category===cat)
+    .forEach(p=>{
+      grid.innerHTML+=`
+      <div class="card">
+        <img src="${p.image}" onclick="openD('${p.id}')">
+        <div class="p">
+          <h4>${p.name}</h4>
+          <div class="price">${p.price} د.ع</div>
+          ${p.old_price && p.old_price!=p.price ? `<div class="old">${p.old_price}</div>`:""}
+          <button class="btn" onclick="openD('${p.id}')">عرض المنتج</button>
+        </div>
+      </div>`;
+    });
 }
 
+/* ===== DETAILS ===== */
 function openD(id){
-  current=products.find(p=>p.id==id);
+  current=products.find(p=>p.id===id);
   dImg.src=current.image;
   dName.textContent=current.name;
-  dDesc.textContent=current.desc||"";
+  dDesc.textContent=current.desc || "";
   dPrice.textContent=current.price+" د.ع";
   details.style.display="block";
 }
-function closeD(){details.style.display="none"}
-function add(){
-  cart[current.id]=(cart[current.id]||0)+1;
-  alert("تمت الإضافة");
+function closeD(){
+  details.style.display="none";
 }
+
+/* ===== CART ===== */
+function addToCart(){
+  if(!current) return;
+  cart[current.id]=(cart[current.id]||0)+1;
+  alert("تمت إضافة المنتج إلى السلة");
+}
+
+/* ===== WHATSAPP ===== */
 function sendWhats(){
-  let msg="طلب جديد من معرض الفردوس%0A";
+  if(Object.keys(cart).length===0){
+    alert("السلة فارغة");
+    return;
+  }
+  let msg="طلب جديد من معرض الفردوس%0A%0A";
   for(let id in cart){
-    let p=products.find(x=>x.id==id);
+    let p=products.find(x=>x.id===id);
     msg+=`${p.name} × ${cart[id]}%0A`;
   }
-  window.open(`https://wa.me/${WA}?text=${msg}`);
+  window.open(`https://wa.me/${WHATSAPP}?text=${msg}`);
 }
 </script>
+
 </body>
 </html>
