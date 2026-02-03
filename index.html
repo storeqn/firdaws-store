@@ -7,7 +7,7 @@
 
   <!-- PWA / Safari -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0b3bbd">
+  <meta name="theme-color" content="#2b2d5f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="معرض الفردوس">
@@ -15,32 +15,38 @@
 
   <style>
     :root{
-      --bg:#f6f8ff;
+      --bg:#0f1026;         /* نيلي غامق */
+      --bg2:#171a3a;        /* نيلي أفتح */
       --paper:#ffffff;
+      --card:#121430;
       --ink:#0b1220;
-      --muted:#5b677a;
-      --line:#e6ebf5;
-      --brand:#0b3bbd;
-      --brand2:#1e66f5;
+      --text:#eef2ff;       /* نص فاتح */
+      --muted:#b9c0ff;
+      --line:rgba(255,255,255,.10);
+      --brand:#5b7cff;      /* نيلي/أزرق */
+      --brand2:#3a5cff;
       --ok:#16a34a;
       --danger:#ef4444;
-      --shadow:0 10px 30px rgba(11,18,32,.10);
+      --shadow:0 14px 34px rgba(0,0,0,.25);
       --r:16px;
     }
     *{box-sizing:border-box}
     body{
-      margin:0; font-family:system-ui, "Segoe UI", Tahoma, Arial;
-      color:var(--ink); background:var(--bg);
+      margin:0;
+      font-family:system-ui,"Segoe UI",Tahoma,Arial;
+      background: radial-gradient(1200px 600px at 50% -200px, rgba(91,124,255,.25), transparent 60%),
+                  linear-gradient(180deg, var(--bg), var(--bg2));
+      color:var(--text);
     }
     a{color:inherit; text-decoration:none}
-    button{font-family:inherit}
+    button,input,textarea{font-family:inherit}
 
     /* Header */
     header{
       position:sticky; top:0; z-index:50;
-      background:rgba(255,255,255,.92);
-      backdrop-filter: blur(10px);
-      border-bottom:1px solid var(--line);
+      background: rgba(18,20,48,.78);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
     }
     .bar{
       max-width:1200px; margin:auto;
@@ -50,146 +56,87 @@
     }
     .brand{
       justify-self:center;
-      display:flex; align-items:center; gap:10px;
-    }
-    .logo{
-      width:40px; height:40px; border-radius:14px;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      box-shadow: 0 10px 24px rgba(11,59,189,.22);
-    }
-    .brand .t{
-      font-weight:1000; letter-spacing:.2px;
-      font-size:18px; line-height:1.05;
       text-align:center;
     }
+    .brand .t{
+      font-weight:1000;
+      font-size:18px;
+      line-height:1.1;
+      letter-spacing:.2px;
+    }
     .brand .s{
-      font-size:12px; color:var(--muted); text-align:center; margin-top:2px;
+      margin-top:3px;
+      font-size:12px;
+      color: rgba(185,192,255,.95);
     }
 
-    .leftTools, .rightTools{display:flex; gap:8px; align-items:center}
+    .leftTools,.rightTools{display:flex; gap:8px; align-items:center}
     .leftTools{justify-self:start}
     .rightTools{justify-self:end}
-    .iconBtn{
-      border:1px solid var(--line);
-      background:var(--paper);
-      border-radius:14px;
-      padding:10px 12px;
-      cursor:pointer;
-      box-shadow: 0 6px 16px rgba(11,18,32,.06);
-      display:flex; gap:8px; align-items:center;
-      font-weight:900;
-    }
+
     .pill{
       border:1px solid var(--line);
-      background:var(--paper);
+      background: rgba(255,255,255,.06);
       border-radius:999px;
       padding:10px 12px;
       width:min(520px, 92vw);
       display:flex; gap:10px; align-items:center;
-      box-shadow: 0 6px 16px rgba(11,18,32,.06);
     }
     .pill input{
       border:0; outline:0; width:100%;
       background:transparent; font-size:14px;
+      color:var(--text);
+    }
+    .pill input::placeholder{color: rgba(185,192,255,.75)}
+    .iconBtn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      border-radius:14px;
+      padding:10px 12px;
+      cursor:pointer;
+      display:flex; gap:8px; align-items:center;
+      font-weight:1000;
+      box-shadow: 0 10px 20px rgba(0,0,0,.18);
     }
     .badge{
       min-width:22px; height:22px; border-radius:999px;
       display:inline-flex; align-items:center; justify-content:center;
-      background:rgba(11,59,189,.10);
-      border:1px solid rgba(11,59,189,.18);
+      background: rgba(91,124,255,.20);
+      border: 1px solid rgba(91,124,255,.35);
       font-size:12px; font-weight:1000;
     }
 
-    /* Hide parts on scroll: keep only brand */
-    header.compact .pill,
-    header.compact .rightTools,
-    header.compact .leftTools{display:none}
-    header.compact .bar{grid-template-columns:1fr}
-    header.compact .brand{justify-self:center}
+    /* Categories bar (text only) */
+    .cats{
+      max-width:1200px; margin:auto;
+      padding:0 12px 12px;
+      display:flex; gap:8px; overflow:auto;
+    }
+    .catBtn{
+      white-space:nowrap;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      border-radius:999px;
+      padding:8px 12px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:13px;
+    }
+    .catBtn.active{
+      background: linear-gradient(135deg, rgba(91,124,255,.95), rgba(58,92,255,.95));
+      border-color: rgba(91,124,255,.50);
+    }
 
     /* Layout */
     .wrap{max-width:1200px; margin:auto; padding:14px 12px}
-    .hero{
-      border-radius: var(--r);
-      background: linear-gradient(135deg, rgba(11,59,189,.12), rgba(30,102,245,.08));
-      border:1px solid var(--line);
-      box-shadow: var(--shadow);
-      padding:16px;
-      display:grid; gap:12px;
-      grid-template-columns: 1.1fr .9fr;
-      align-items:center;
+    .secHead{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin:12px 0 10px;
     }
-    @media (max-width: 900px){
-      .hero{grid-template-columns:1fr}
-    }
-    .hero h1{margin:0; font-size:22px; font-weight:1000}
-    .hero p{margin:6px 0 0; color:var(--muted); line-height:1.6}
-    .hero .ctaRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
-    .cta{
-      border:0; cursor:pointer;
-      border-radius:14px;
-      padding:10px 12px;
-      font-weight:1000;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      color:white;
-      box-shadow: 0 10px 22px rgba(11,59,189,.18);
-    }
-    .cta.ghost{
-      background:var(--paper);
-      border:1px solid var(--line);
-      color:var(--ink);
-      box-shadow: 0 6px 16px rgba(11,18,32,.06);
-    }
-
-    /* Category blocks (qn style sections) */
-    .secHead{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:16px 0 10px}
     .secHead .h{font-size:16px; font-weight:1000}
-    .secHead .sub{color:var(--muted); font-size:13px}
-    .catsGrid{
-      display:grid; gap:12px;
-      grid-template-columns: repeat(3, 1fr);
-    }
-    @media (max-width: 900px){
-      .catsGrid{grid-template-columns: 1fr}
-    }
-    .catCard{
-      position:relative;
-      border-radius: var(--r);
-      border:1px solid var(--line);
-      background: #eef3ff;
-      overflow:hidden;
-      box-shadow: var(--shadow);
-      min-height: 150px;
-      display:flex; align-items:flex-end;
-    }
-    .catImg{
-      position:absolute; inset:0;
-      background-size:cover; background-position:center;
-      filter:saturate(1.05);
-      transform: scale(1.02);
-    }
-    .catShade{
-      position:absolute; inset:0;
-      background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.62));
-    }
-    .catContent{
-      position:relative;
-      padding:14px;
-      width:100%;
-      color:#fff;
-      display:flex; justify-content:space-between; align-items:end; gap:10px;
-    }
-    .catTitle{font-weight:1000; font-size:18px}
-    .catBrand{opacity:.85; font-size:12px; margin-top:4px}
-    .catBtn{
-      border:0; cursor:pointer;
-      padding:10px 12px;
-      border-radius:14px;
-      background:#fff;
-      color:#111;
-      font-weight:1000;
-      white-space:nowrap;
-    }
+    .secHead .sub{color: rgba(185,192,255,.85); font-size:13px}
 
     /* Product grid */
     .grid{
@@ -201,39 +148,60 @@
 
     .card{
       border:1px solid var(--line);
-      background:var(--paper);
+      background: rgba(255,255,255,.06);
       border-radius: var(--r);
-      box-shadow: 0 10px 24px rgba(11,18,32,.08);
+      box-shadow: var(--shadow);
       overflow:hidden;
     }
     .img{
       width:100%;
       height:160px;
       object-fit:contain;
-      background:#f3f6ff;
+      background: rgba(255,255,255,.06);
       display:block;
+      cursor:pointer;
     }
-    @media (max-width: 720px){
-      .img{height:140px}
-    }
+    @media (max-width: 720px){ .img{height:140px} }
+
     .p{padding:10px}
-    .name{font-weight:1000; font-size:13.5px; line-height:1.25; min-height:34px}
-    .cat{font-size:12px; color:var(--muted); margin-top:6px}
+    .name{
+      font-weight:1000;
+      font-size:13.5px;
+      line-height:1.25;
+      min-height:34px;
+      cursor:pointer;
+    }
+    .cat{
+      font-size:12px;
+      color: rgba(185,192,255,.85);
+      margin-top:6px;
+    }
     .row{display:flex; align-items:baseline; gap:8px; margin-top:10px; flex-wrap:wrap}
-    .price{font-weight:1000; color:var(--brand); font-size:14px}
-    .old{font-size:12px; color:var(--muted); text-decoration:line-through}
+    .price{font-weight:1000; color: #cfe0ff; font-size:14px}
+    .old{font-size:12px; color: rgba(185,192,255,.85); text-decoration:line-through}
+
     .btnRow{display:flex; gap:8px; margin-top:10px}
     .btn{
       flex:1;
       border-radius:14px;
       padding:10px 10px;
       border:1px solid var(--line);
-      background:#fff;
+      background: rgba(255,255,255,.06);
+      color:var(--text);
       cursor:pointer;
       font-weight:1000;
     }
-    .btn.add{background:rgba(11,59,189,.10); border-color:rgba(11,59,189,.18)}
-    .btn.buy{background: linear-gradient(135deg, var(--ok), #22c55e); color:#fff; border-color:transparent}
+    .btn.add{
+      background: rgba(91,124,255,.18);
+      border-color: rgba(91,124,255,.35);
+    }
+    .btn.order{
+      background: linear-gradient(135deg, rgba(22,163,74,.95), rgba(34,197,94,.95));
+      border-color: transparent;
+      color:#fff;
+    }
+
+    .posRel{position:relative}
     .tag{
       position:absolute; top:10px; right:10px;
       background:rgba(239,68,68,.95);
@@ -245,62 +213,119 @@
     }
     .tag2{
       position:absolute; top:10px; left:10px;
-      background:rgba(11,59,189,.95);
+      background:rgba(91,124,255,.95);
       color:#fff;
       font-weight:1000;
       font-size:12px;
       padding:6px 10px;
       border-radius:999px;
     }
-    .posRel{position:relative}
 
-    /* Drawers (Quick View + Cart) */
-    .overlay{position:fixed; inset:0; background:rgba(0,0,0,.50); display:none; z-index:90}
+    /* Always-visible cart bar (bottom) */
+    .cartBar{
+      position:fixed;
+      left:12px; right:12px; bottom:12px;
+      z-index:60;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(18,20,48,.85);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 46px rgba(0,0,0,.35);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 12px;
+    }
+    .cartBar .sum{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width: 140px;
+    }
+    .cartBar .sum .t{font-size:12px; color: rgba(185,192,255,.85)}
+    .cartBar .sum .v{font-weight:1000; font-size:14px}
+    .cartBar .go{
+      border:0; cursor:pointer;
+      border-radius:14px;
+      padding:12px 14px;
+      font-weight:1000;
+      color:#fff;
+      background: linear-gradient(135deg, rgba(91,124,255,.95), rgba(58,92,255,.95));
+      display:flex; gap:10px; align-items:center;
+      white-space:nowrap;
+    }
+    .cartBar .go .b{
+      background: rgba(255,255,255,.20);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:12px;
+      font-weight:1000;
+    }
+
+    /* Drawers */
+    .overlay{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; z-index:90}
     .drawer{
       position:fixed; top:0; left:0;
-      height:100vh; width:min(420px, 92vw);
-      background:#fff;
-      box-shadow: 0 30px 70px rgba(0,0,0,.25);
+      height:100vh; width:min(440px, 94vw);
+      background: #0f1026;
+      box-shadow: 0 30px 70px rgba(0,0,0,.40);
       transform: translateX(-110%);
       transition: .2s ease;
       z-index:100;
       display:flex; flex-direction:column;
+      border-right: 1px solid rgba(255,255,255,.10);
     }
     .drawer.open{transform:translateX(0)}
     .overlay.show{display:block}
-    .dHead{padding:14px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:10px}
+    .dHead{
+      padding:14px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex; justify-content:space-between; align-items:center; gap:10px
+    }
     .dHead .t{font-weight:1000}
-    .x{border:1px solid var(--line); background:#fff; border-radius:12px; padding:8px 10px; cursor:pointer; font-weight:1000}
+    .x{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      border-radius:12px;
+      padding:8px 10px;
+      cursor:pointer;
+      font-weight:1000
+    }
     .dBody{padding:14px; overflow:auto; flex:1}
-    .dFoot{padding:14px; border-top:1px solid var(--line); background:#fafbff}
+    .dFoot{padding:14px; border-top:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.03)}
 
-    .mini{color:var(--muted); font-size:13px; line-height:1.55}
+    .mini{color: rgba(185,192,255,.85); font-size:13px; line-height:1.55}
     .form{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px}
     .form input, .form textarea{
-      border:1px solid var(--line);
+      border:1px solid rgba(255,255,255,.14);
       border-radius:14px;
       padding:10px 12px;
       outline:none;
       font-weight:700;
-      background:#fff;
+      background: rgba(255,255,255,.06);
+      color: var(--text);
     }
+    .form input::placeholder, .form textarea::placeholder{color: rgba(185,192,255,.70)}
     .form .full{grid-column:1 / -1}
-    .sumLine{display:flex; justify-content:space-between; color:var(--muted); font-size:13px; margin-top:6px}
-    .sumLine b{color:var(--ink)}
+    .sumLine{display:flex; justify-content:space-between; color: rgba(185,192,255,.85); font-size:13px; margin-top:6px}
+    .sumLine b{color:var(--text)}
     .send{
       width:100%;
       border:0; cursor:pointer;
       border-radius:14px;
       padding:12px 12px;
       font-weight:1000;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      background: linear-gradient(135deg, rgba(91,124,255,.95), rgba(58,92,255,.95));
       color:#fff;
     }
     .clear{
       width:100%;
       border:1px solid rgba(239,68,68,.25);
-      background: rgba(239,68,68,.06);
-      color:var(--danger);
+      background: rgba(239,68,68,.08);
+      color: #ffb4b4;
       border-radius:14px;
       padding:12px 12px;
       font-weight:1000;
@@ -311,31 +336,40 @@
     .cartRow{
       display:flex; gap:10px;
       padding:10px 0;
-      border-bottom:1px solid var(--line);
+      border-bottom:1px solid rgba(255,255,255,.10);
       align-items:flex-start;
     }
-    .thumb{width:58px; height:58px; border-radius:14px; object-fit:contain; background:#f3f6ff; border:1px solid var(--line)}
+    .thumb{width:58px; height:58px; border-radius:14px; object-fit:contain; background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10)}
     .cMain{flex:1}
     .cName{font-weight:1000; font-size:13px}
-    .cMeta{color:var(--muted); font-size:12px; margin-top:6px}
+    .cMeta{color: rgba(185,192,255,.80); font-size:12px; margin-top:6px}
     .qty{display:flex; gap:8px; align-items:center; margin-top:8px}
-    .qbtn{width:32px; height:32px; border-radius:12px; border:1px solid var(--line); background:#fff; cursor:pointer; font-weight:1000}
+    .qbtn{width:32px; height:32px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color:var(--text); cursor:pointer; font-weight:1000}
+
+    /* Product details drawer (right) */
+    #prodDrawer{left:auto; right:0; transform:translateX(110%); border-right:0; border-left:1px solid rgba(255,255,255,.10)}
+    #prodDrawer.open{transform:translateX(0)}
+    .prodImg{
+      width:100%;
+      height:240px;
+      object-fit:contain;
+      background: rgba(255,255,255,.06);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+    }
   </style>
 </head>
 
 <body>
-<header id="head">
+<header>
   <div class="bar">
     <div class="leftTools">
       <button class="iconBtn" onclick="openCart()">🛒 السلة <span class="badge" id="cartCount">0</span></button>
     </div>
 
     <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
-      <div>
-        <div class="t">معرض الفردوس</div>
-        <div class="s">تسوق سريع • طلب واتساب</div>
-      </div>
+      <div class="t">معرض الفردوس</div>
+      <div class="s">للهواتف والأجهزة الكهربائية</div>
     </div>
 
     <div class="rightTools">
@@ -343,43 +377,17 @@
     </div>
   </div>
 
-  <div style="display:flex; justify-content:center; padding:0 12px 12px">
+  <div style="display:flex; justify-content:center; padding:0 12px 10px">
     <div class="pill">
       🔎
       <input id="q" placeholder="ابحث عن منتج..." />
     </div>
   </div>
+
+  <div class="cats" id="catsBar"></div>
 </header>
 
 <div class="wrap">
-  <!-- Hero -->
-  <section class="hero">
-    <div>
-      <h1>أقسام مرتّبة مثل المتاجر الكبيرة</h1>
-      <p>اختار القسم، شوف المنتجات، افتح Quick View، واجمع طلبك… وبضغطة وحدة يروح للواتساب مع التفاصيل.</p>
-      <div class="ctaRow">
-        <button class="cta" onclick="scrollToCats()">عرض الأقسام</button>
-        <button class="cta ghost" onclick="scrollToShop()">عرض كل المنتجات</button>
-      </div>
-    </div>
-    <div class="mini">
-      ✅ تصميم موبايل سريع جدًا<br>
-      ✅ Quick View مثل qn-store<br>
-      ✅ سلة + اسم/هاتف/عنوان + إرسال واتساب
-    </div>
-  </section>
-
-  <!-- Categories blocks -->
-  <div class="secHead">
-    <div>
-      <div class="h">الأقسام</div>
-      <div class="sub">اختَر قسم ثم “عرض المنتجات”</div>
-    </div>
-  </div>
-
-  <div id="catsGrid" class="catsGrid"></div>
-
-  <!-- Shop -->
   <div class="secHead" id="shopTop">
     <div>
       <div class="h">المنتجات</div>
@@ -388,6 +396,17 @@
   </div>
 
   <div id="grid" class="grid"></div>
+</div>
+
+<!-- Always visible cart bar -->
+<div class="cartBar" onclick="openCart()" role="button" aria-label="Open Cart">
+  <div class="sum">
+    <div class="t">إجمالي السلة</div>
+    <div class="v" id="cartSum">0 د.ع</div>
+  </div>
+  <button class="go" type="button">
+    فتح السلة <span class="b" id="cartQty">0</span>
+  </button>
 </div>
 
 <!-- Overlay + Drawer (Cart) -->
@@ -416,24 +435,19 @@
   </div>
 </div>
 
-<!-- Drawer (Quick View) -->
-<div class="drawer" id="viewDrawer" style="left:auto; right:0; transform:translateX(110%)" aria-hidden="true">
+<!-- Drawer (Product details) -->
+<div class="drawer" id="prodDrawer" aria-hidden="true">
   <div class="dHead">
-    <div class="t" id="vTitle">تفاصيل المنتج</div>
+    <div class="t" id="pTitle">تفاصيل المنتج</div>
     <button class="x" onclick="closeAll()">إغلاق</button>
   </div>
-  <div class="dBody" id="viewBody"></div>
+  <div class="dBody" id="pBody"></div>
 </div>
 
 <script>
   // ====== إعداداتك ======
   const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vToXcV323xvYtiuz6tg-d0q_f2iwOwnYBpCRqAgSnarQ2PYVZ9Z1GJKlSmftjuajtlJ6zBfmVbRwArp/pub?output=csv";
   const WHATSAPP_NUMBER = "9647719183122";
-
-  // SW (سرعة)
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
-  }
 
   const $ = (id)=>document.getElementById(id);
 
@@ -445,7 +459,7 @@
   };
 
   function loadCart(){ try { return JSON.parse(localStorage.getItem("cart")||"{}"); } catch { return {}; } }
-  function saveCart(){ localStorage.setItem("cart", JSON.stringify(state.cart)); updateCartCount(); }
+  function saveCart(){ localStorage.setItem("cart", JSON.stringify(state.cart)); updateCartUI(); }
 
   // CSV parser يدعم النصوص التي تحتوي فاصلة داخل " "
   function parseCSV(text){
@@ -503,55 +517,38 @@
       state.cats = [...new Set(state.products.map(p=>p.category))].sort((a,b)=>a.localeCompare(b,"ar"));
 
       $("status").textContent = `تم تحميل ${state.products.length} منتج`;
-      renderCategoryBlocks();
+      renderCatsBar();
       renderProducts();
-      updateCartCount();
+      updateCartUI();
     }catch(e){
       $("status").textContent = "فشل التحميل: تأكد من رابط CSV وأن الشيت منشور.";
       console.error(e);
     }
   }
 
-  // Category blocks like qn-store home
-  function renderCategoryBlocks(){
-    const wrap = $("catsGrid");
-    wrap.innerHTML = "";
+  function renderCatsBar(){
+    const bar = $("catsBar");
+    bar.innerHTML = "";
+
+    const allBtn = document.createElement("button");
+    allBtn.className = "catBtn" + (!state.activeCat ? " active" : "");
+    allBtn.textContent = "الكل";
+    allBtn.onclick = ()=>{ state.activeCat=""; setActiveCatButton(allBtn); renderProducts(); };
+    bar.appendChild(allBtn);
 
     state.cats.forEach(cat=>{
-      // صورة القسم: نستخدم أول منتج من نفس القسم (أقرب لأسلوب qn-store)
-      const p = state.products.find(x=>x.category===cat);
-      const bg = p?.image ? `url('${p.image.replace(/'/g,"%27")}')` : "";
-      const brand = guessBrandFromCat(cat);
-
-      const el = document.createElement("div");
-      el.className = "catCard";
-      el.innerHTML = `
-        <div class="catImg" style="background-image:${bg?`linear-gradient(135deg, rgba(11,59,189,.25), rgba(0,0,0,.05)), ${bg}`:`linear-gradient(135deg, rgba(11,59,189,.22), rgba(30,102,245,.10))`};"></div>
-        <div class="catShade"></div>
-        <div class="catContent">
-          <div>
-            <div class="catTitle">${esc(cat)}</div>
-            <div class="catBrand">${esc(brand)}</div>
-          </div>
-          <button class="catBtn" onclick="showCategory('${cat.replace(/'/g,"\\'")}')">عرض المنتجات</button>
-        </div>
-      `;
-      wrap.appendChild(el);
+      const b = document.createElement("button");
+      b.className = "catBtn";
+      b.textContent = cat;
+      b.onclick = ()=>{ state.activeCat=cat; setActiveCatButton(b); renderProducts(); };
+      bar.appendChild(b);
     });
   }
 
-  function guessBrandFromCat(cat){
-    // مجرد نص ثانوي مثل qn-store (مو إلزامي)
-    if (cat.includes("عطور")) return "Perfume";
-    if (cat.includes("مكياج")) return "Makeup";
-    if (cat.includes("غسولات")) return "Skincare";
-    return "Collection";
-  }
-
-  function showCategory(cat){
-    state.activeCat = cat;
-    $("shopTop").scrollIntoView({behavior:"smooth"});
-    renderProducts();
+  function setActiveCatButton(btn){
+    [...$("catsBar").children].forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    scrollToShop();
   }
 
   function baseFilter(){
@@ -578,17 +575,22 @@
       card.innerHTML = `
         ${hasDisc ? `<div class="tag">خصم ${disc}%</div>` : ``}
         ${p.offer ? `<div class="tag2">${esc(p.discount_note || "عرض خاص")}</div>` : ``}
-        <img class="img" src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none'">
+
+        <img class="img" src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy"
+             onclick="openProduct('${p.id}')" onerror="this.style.display='none'">
+
         <div class="p">
-          <div class="name">${esc(p.name)}</div>
+          <div class="name" onclick="openProduct('${p.id}')">${esc(p.name)}</div>
           <div class="cat">${esc(p.category)}</div>
+
           <div class="row">
             <div class="price">${money(p.price)} د.ع</div>
             ${hasDisc ? `<div class="old">${money(p.old_price)} د.ع</div>` : ``}
           </div>
+
           <div class="btnRow">
             <button class="btn add" onclick="addToCart('${p.id}')">إضافة للسلة</button>
-            <button class="btn buy" onclick="openQuickView('${p.id}')">Quick View</button>
+            <button class="btn order" onclick="orderNow('${p.id}')">اطلب الآن</button>
           </div>
         </div>
       `;
@@ -596,43 +598,44 @@
     });
   }
 
-  // Quick View drawer (like qn-store)
-  function openQuickView(id){
+  // دخول المنتج للتفاصيل
+  function openProduct(id){
     const p = state.products.find(x=>x.id===id);
     if(!p) return;
-    $("vTitle").textContent = p.name;
-    const hasDisc = p.old_price && p.old_price>p.price;
 
-    $("viewBody").innerHTML = `
-      <img class="img" style="height:220px;border-radius:16px" src="${esc(p.image)}" onerror="this.style.display='none'">
-      <div style="margin-top:10px;font-weight:1000;font-size:16px">${esc(p.name)}</div>
-      <div class="mini" style="margin-top:6px">${esc(p.desc || "")}</div>
-      <div class="row" style="margin-top:12px">
+    const hasDisc = p.old_price && p.old_price>p.price;
+    const disc = hasDisc ? pct(p.old_price, p.price) : 0;
+
+    $("pTitle").textContent = p.name;
+    $("pBody").innerHTML = `
+      <img class="prodImg" src="${esc(p.image)}" onerror="this.style.display='none'">
+      <div style="margin-top:12px; font-weight:1000; font-size:16px">${esc(p.name)}</div>
+      <div class="mini" style="margin-top:8px">${esc(p.desc || "")}</div>
+
+      <div style="margin-top:12px" class="row">
         <div class="price">${money(p.price)} د.ع</div>
         ${hasDisc ? `<div class="old">${money(p.old_price)} د.ع</div>` : ``}
+        ${hasDisc ? `<div class="badge" style="height:auto;padding:4px 10px">خصم ${disc}%</div>` : ``}
       </div>
-      <div class="btnRow" style="margin-top:12px">
+
+      <div class="btnRow" style="margin-top:14px">
         <button class="btn add" onclick="addToCart('${p.id}')">إضافة للسلة</button>
-        <button class="btn buy" onclick="buyNow('${p.id}')">اطلب الآن</button>
+        <button class="btn order" onclick="orderNow('${p.id}')">اطلب الآن</button>
       </div>
     `;
 
     showOverlay(true);
-    $("viewDrawer").classList.add("open");
+    $("prodDrawer").classList.add("open");
   }
 
+  // السلة
   function addToCart(id){
     state.cart[id] = (state.cart[id]||0) + 1;
     saveCart();
   }
-  function buyNow(id){
+  function orderNow(id){
     addToCart(id);
     openCart();
-  }
-
-  function updateCartCount(){
-    const c = Object.values(state.cart).reduce((a,b)=>a+b,0);
-    $("cartCount").textContent = c;
   }
 
   function cartItems(){
@@ -642,6 +645,16 @@
       const oldp = p.old_price && p.old_price>0 ? p.old_price : p.price;
       return { ...p, qty, lineNew:p.price*qty, lineOld:oldp*qty };
     }).filter(Boolean);
+  }
+
+  function updateCartUI(){
+    const qty = Object.values(state.cart).reduce((a,b)=>a+b,0);
+    $("cartCount").textContent = qty;
+    $("cartQty").textContent = qty;
+
+    const items = cartItems();
+    const sumNew = items.reduce((a,b)=>a+b.lineNew,0);
+    $("cartSum").textContent = `${money(sumNew)} د.ع`;
   }
 
   function openCart(){
@@ -693,6 +706,7 @@
   function removeItem(id){ delete state.cart[id]; saveCart(); renderCart(); }
   function clearCart(){ state.cart={}; saveCart(); renderCart(); }
 
+  // إرسال واتساب
   function sendWhatsApp(){
     const items = cartItems();
     if(!items.length){ alert("السلة فارغة"); return; }
@@ -738,18 +752,12 @@
   function closeAll(){
     showOverlay(false);
     $("cartDrawer").classList.remove("open");
-    $("viewDrawer").classList.remove("open");
+    $("prodDrawer").classList.remove("open");
   }
 
-  function scrollToCats(){ document.getElementById("catsGrid").scrollIntoView({behavior:"smooth"}); }
   function scrollToShop(){ document.getElementById("shopTop").scrollIntoView({behavior:"smooth"}); }
 
   $("q").addEventListener("input", renderProducts);
-
-  // header compact on scroll (يبقى الاسم فقط)
-  window.addEventListener("scroll", ()=>{
-    $("head").classList.toggle("compact", window.scrollY > 70);
-  });
 
   load();
 </script>
