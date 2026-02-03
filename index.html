@@ -6,29 +6,23 @@
 <title>معرض الفردوس</title>
 
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#111">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 
 <style>
 :root{
-  --bg:#0b0d12;
-  --card:#141824;
-  --text:#fff;
-  --muted:#aaa;
-  --main:#2d7dff;
-  --radius:16px;
-}
-body.light{
-  --bg:#f5f6fa;
-  --card:#fff;
+  --bg:#f6f8fc;
+  --card:#ffffff;
   --text:#111;
-  --muted:#555;
+  --muted:#666;
+  --main:#1e66f5;
+  --border:#e3e6ef;
+  --radius:14px;
 }
 
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:system-ui,Tahoma;
+  font-family:system-ui,Tahoma,Arial;
   background:var(--bg);
   color:var(--text);
 }
@@ -38,90 +32,105 @@ header{
   position:sticky;
   top:0;
   z-index:10;
-  background:rgba(0,0,0,.8);
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid #333;
+  background:#fff;
+  border-bottom:1px solid var(--border);
 }
 header.compact .cats{display:none}
 
 .top{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:10px;
-}
-.logo{
+  text-align:center;
+  padding:12px 10px;
   font-size:20px;
   font-weight:900;
-}
-.actions{
-  position:absolute;
-  left:10px;
-  display:flex;
-  gap:6px;
-}
-.actions button{
-  background:none;
-  border:1px solid #444;
-  color:var(--text);
-  border-radius:10px;
-  padding:6px 10px;
-  cursor:pointer;
 }
 
 .cats{
   display:flex;
-  gap:6px;
-  padding:6px 10px;
+  gap:8px;
+  padding:8px 10px;
   overflow:auto;
 }
 .cats div{
-  padding:6px 12px;
+  padding:6px 14px;
   border-radius:20px;
-  background:#222;
-  white-space:nowrap;
+  background:#eef1f8;
+  font-size:14px;
   cursor:pointer;
+  white-space:nowrap;
 }
-.cats .active{background:var(--main)}
+.cats .active{
+  background:var(--main);
+  color:#fff;
+}
 
 /* ===== CONTENT ===== */
 .wrap{padding:12px}
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-  gap:10px;
+  gap:12px;
 }
+
 .card{
   background:var(--card);
   border-radius:var(--radius);
+  border:1px solid var(--border);
   overflow:hidden;
 }
+
 .card img{
   width:100%;
-  height:140px;
+  height:150px;
   object-fit:contain;
-  background:#000;
+  background:#fafafa;
 }
-.card .p{padding:8px}
-.card h4{margin:0;font-size:14px}
-.price{font-weight:900;margin-top:6px}
-.old{text-decoration:line-through;color:var(--muted);font-size:12px}
-.btns{display:flex;gap:6px;margin-top:6px}
+
+.card .p{
+  padding:10px;
+}
+
+.card h4{
+  margin:0;
+  font-size:14px;
+  line-height:1.4;
+}
+
+.price{
+  margin-top:6px;
+  font-weight:900;
+  color:var(--main);
+}
+.old{
+  font-size:12px;
+  color:var(--muted);
+  text-decoration:line-through;
+}
+
+.btns{
+  display:flex;
+  gap:6px;
+  margin-top:8px;
+}
 .btn{
   flex:1;
-  border:none;
-  border-radius:10px;
   padding:8px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#f1f3fa;
   cursor:pointer;
   font-weight:700;
 }
-.buy{background:var(--main);color:#fff}
-.add{background:#333;color:#fff}
+.buy{
+  background:var(--main);
+  color:#fff;
+  border:none;
+}
 
 /* ===== PRODUCT MODAL ===== */
 .overlay{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.6);
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
   display:none;
   z-index:20;
 }
@@ -129,11 +138,11 @@ header.compact .cats{display:none}
   position:fixed;
   bottom:0;
   left:0;right:0;
-  background:var(--bg);
+  background:#fff;
   border-radius:20px 20px 0 0;
   max-height:85vh;
   overflow:auto;
-  padding:12px;
+  padding:14px;
   display:none;
   z-index:30;
 }
@@ -143,14 +152,14 @@ header.compact .cats{display:none}
   object-fit:contain;
 }
 
-/* ===== CART ===== */
+/* ===== CART BUTTON ===== */
 .cartBtn{
   position:fixed;
-  bottom:15px;
-  left:15px;
+  bottom:16px;
+  left:16px;
   background:var(--main);
   color:#fff;
-  padding:12px 16px;
+  padding:14px 18px;
   border-radius:30px;
   font-weight:900;
   cursor:pointer;
@@ -162,12 +171,7 @@ header.compact .cats{display:none}
 <body>
 
 <header id="head">
-  <div class="top">
-    <div class="actions">
-      <button onclick="toggleTheme()">🌓</button>
-    </div>
-    <div class="logo">معرض الفردوس</div>
-  </div>
+  <div class="top">معرض الفردوس</div>
   <div class="cats" id="cats"></div>
 </header>
 
@@ -184,6 +188,7 @@ header.compact .cats{display:none}
 <script>
 const SHEET="https://docs.google.com/spreadsheets/d/e/2PACX-1vToXcV323xvYtiuz6tg-d0q_f2iwOwnYBpCRqAgSnarQ2PYVZ9Z1GJKlSmftjuajtlJ6zBfmVbRwArp/pub?output=csv";
 const WA="9647719183122";
+
 let products=[],cart={},cat="";
 
 fetch(SHEET).then(r=>r.text()).then(t=>{
@@ -205,7 +210,12 @@ function drawCats(){
     c.innerHTML+=`<div onclick="setCat('${x}')">${x}</div>`;
   });
 }
-function setCat(x){cat=x;draw();}
+function setCat(x){
+  cat=x;
+  document.querySelectorAll(".cats div").forEach(d=>d.classList.remove("active"));
+  event.target.classList.add("active");
+  draw();
+}
 
 function draw(){
   const g=document.getElementById("grid");
@@ -219,7 +229,7 @@ function draw(){
         <div class="price">${p.price} د.ع</div>
         ${p.old_price&&p.old_price!=p.price?`<div class="old">${p.old_price}</div>`:""}
         <div class="btns">
-          <button class="btn add" onclick="add('${p.id}')">إضافة</button>
+          <button class="btn" onclick="add('${p.id}')">إضافة</button>
           <button class="btn buy" onclick="openProd('${p.id}')">عرض</button>
         </div>
       </div>
@@ -229,38 +239,35 @@ function draw(){
 
 function openProd(id){
   const p=products.find(x=>x.id==id);
-  document.getElementById("pm").innerHTML=`
+  pm.innerHTML=`
     <img src="${p.image}">
     <h2>${p.name}</h2>
-    <p>${p.desc}</p>
-    <b>${p.price} د.ع</b>
+    <p>${p.desc||""}</p>
+    <b style="color:var(--main);font-size:18px">${p.price} د.ع</b>
     <br><br>
     <button class="btn buy" onclick="add('${p.id}')">إضافة للسلة</button>
   `;
-  document.getElementById("ov").style.display="block";
-  document.getElementById("pm").style.display="block";
+  ov.style.display="block";
+  pm.style.display="block";
 }
 function closeProd(){
   ov.style.display="none";
   pm.style.display="none";
 }
 
-function add(id){cart[id]=(cart[id]||0)+1;alert("تمت الإضافة");}
+function add(id){
+  cart[id]=(cart[id]||0)+1;
+  alert("تمت الإضافة");
+}
 
 function sendWhats(){
-  let msg="طلب جديد%0A";
+  let msg="طلب جديد من معرض الفردوس%0A";
   for(let id in cart){
     let p=products.find(x=>x.id==id);
-    msg+=`${p.name} x${cart[id]}%0A`;
+    msg+=`${p.name} × ${cart[id]}%0A`;
   }
   window.open(`https://wa.me/${WA}?text=${msg}`);
 }
-
-function toggleTheme(){
-  document.body.classList.toggle("light");
-  localStorage.setItem("theme",document.body.classList.contains("light")?"l":"d");
-}
-if(localStorage.getItem("theme")=="l")document.body.classList.add("light");
 
 window.addEventListener("scroll",()=>{
   head.classList.toggle("compact",window.scrollY>60);
