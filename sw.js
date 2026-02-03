@@ -1,18 +1,12 @@
-const CACHE = "firdaws-v1";
-const FILES = [
-  "./",
-  "./index.html",
-  "./manifest.json"
-];
+const CACHE = "firdaws-v2";
+const ASSETS = ["./", "./index.html", "./manifest.json"];
 
-self.addEventListener("install", e => {
-  e.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(FILES))
-  );
+self.addEventListener("install", (e) => {
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));
 });
 
-self.addEventListener("fetch", e => {
+self.addEventListener("fetch", (e) => {
   e.respondWith(
-    caches.match(e.request).then(res => res || fetch(e.request))
+    caches.match(e.request).then((r) => r || fetch(e.request))
   );
 });
