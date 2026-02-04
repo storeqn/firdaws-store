@@ -590,6 +590,15 @@
 
       state.cats = [...new Set(state.products.map(p=>p.category))].sort((a,b)=>a.localeCompare(b,"ar"));
 
+// خلي الأجهزة الكهربائية أول قسم
+if(state.cats.includes("الأجهزة الكهربائية")){
+  state.cats = [
+    "الأجهزة الكهربائية",
+    ...state.cats.filter(c=>c!=="الأجهزة الكهربائية")
+  ];
+}
+
+
       $("status").textContent = `تم تحميل ${state.products.length} منتج`;
       renderCatsBar();
       renderSubCatsBar();
@@ -846,7 +855,15 @@
       <img class="prodImg" src="${esc(p.image)}" onerror="this.style.display='none'">
       <div style="margin-top:12px; font-weight:1000; font-size:16px">${esc(p.name)}</div>
       <div class="mini" style="margin-top:6px">${esc(info)}</div>
-      <div class="mini" style="margin-top:10px">${esc(p.desc || "")}</div>
+      <div class="mini" style="
+  margin-top:10px;
+  white-space:pre-wrap;
+  line-height:1.8;
+  font-size:14px;
+">
+  ${esc(p.desc || "")}
+</div>
+
 
       <div style="margin-top:12px" class="row">
         <div class="price">${money(p.price)} د.ع</div>
