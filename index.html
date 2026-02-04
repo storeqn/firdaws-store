@@ -278,7 +278,7 @@
       background: linear-gradient(135deg, rgba(91,124,255,.95), rgba(58,92,255,.95));
       display:flex; gap:10px; align-items:center;
       white-space:nowrap;
-      pointer-events:none; /* حتى الشريط كله يفتح السلة */
+      pointer-events:none;
     }
     .cartBar .go .b{
       background: rgba(255,255,255,.20);
@@ -426,16 +426,12 @@
     <input id="q" placeholder="ابحث عن منتج..." />
   </div>
 
-  <!-- زر إظهار الأقسام (الأقسام مخفية افتراضيًا) -->
   <div class="catsWrap">
     <button class="iconBtn" type="button" onclick="toggleCats()">📂 الأقسام</button>
     <div class="mini">اضغط لعرض الأقسام</div>
   </div>
 
-  <!-- الأقسام الرئيسية -->
   <div class="cats" id="catsBar" style="display:none"></div>
-
-  <!-- يظهر فقط داخل الأجهزة الكهربائية -->
   <div class="cats" id="subCatsBar" style="display:none"></div>
   <div class="cats" id="brandsBar" style="display:none"></div>
 </header>
@@ -451,7 +447,6 @@
   <div id="grid" class="grid"></div>
 </div>
 
-<!-- Always visible cart bar -->
 <div class="cartBar" onclick="openCart()">
   <div class="sum">
     <div class="t">إجمالي السلة</div>
@@ -462,7 +457,6 @@
   </div>
 </div>
 
-<!-- Overlay + Drawer (Cart) -->
 <div class="overlay" id="overlay" onclick="closeAll()"></div>
 
 <div class="drawer" id="cartDrawer" aria-hidden="true">
@@ -488,7 +482,6 @@
   </div>
 </div>
 
-<!-- Drawer (Product details) -->
 <div class="drawer" id="prodDrawer" aria-hidden="true">
   <div class="dHead">
     <div class="t" id="pTitle">تفاصيل المنتج</div>
@@ -498,7 +491,6 @@
 </div>
 
 <script>
-  // ====== إعداداتك ======
   const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vToXcV323xvYtiuz6tg-d0q_f2iwOwnYBpCRqAgSnarQ2PYVZ9Z1GJKlSmftjuajtlJ6zBfmVbRwArp/pub?output=csv";
   const WHATSAPP_NUMBER = "9647719183122";
 
@@ -516,24 +508,19 @@
   function loadCart(){ try { return JSON.parse(localStorage.getItem("cart")||"{}"); } catch { return {}; } }
   function saveCart(){ localStorage.setItem("cart", JSON.stringify(state.cart)); updateCartUI(); }
 
-  // إظهار/إخفاء الأقسام الرئيسية
   function toggleCats(){
     const bar = $("catsBar");
     const show = (bar.style.display === "none" || !bar.style.display);
     bar.style.display = show ? "flex" : "none";
-
-    // عند الإخفاء، نخفي الشرائط الفرعية أيضًا
     if(!show){
       $("subCatsBar").style.display = "none";
       $("brandsBar").style.display = "none";
     }else{
-      // إذا القسم الحالي أجهزة كهربائية نعيد إظهار الشرائط حسب الحالة
       renderSubCatsBar();
       renderBrandsBar();
     }
   }
 
-  // CSV parser يدعم الفواصل داخل " "
   function parseCSV(text){
     const lines = text.trim().split(/\r?\n/);
     const headers = splitLine(lines[0]).map(x=>x.trim());
@@ -570,7 +557,6 @@
       const text = await res.text();
       const rows = parseCSV(text);
 
-      // فلترة قوية لمنع المنتجات الفارغة
       state.products = rows
         .map((r, idx)=>({
           _i: idx,
@@ -590,14 +576,10 @@
 
       state.cats = [...new Set(state.products.map(p=>p.category))].sort((a,b)=>a.localeCompare(b,"ar"));
 
-// خلي الأجهزة الكهربائية أول قسم
-if(state.cats.includes("الأجهزة الكهربائية")){
-  state.cats = [
-    "الأجهزة الكهربائية",
-    ...state.cats.filter(c=>c!=="الأجهزة الكهربائية")
-  ];
-}
-
+      // ✅ خلي الأجهزة الكهربائية أول قسم
+      if(state.cats.includes("الأجهزة الكهربائية")){
+        state.cats = ["الأجهزة الكهربائية", ...state.cats.filter(c=>c!=="الأجهزة الكهربائية")];
+      }
 
       $("status").textContent = `تم تحميل ${state.products.length} منتج`;
       renderCatsBar();
@@ -611,7 +593,6 @@ if(state.cats.includes("الأجهزة الكهربائية")){
     }
   }
 
-  // الأقسام الرئيسية
   function renderCatsBar(){
     const bar = $("catsBar");
     bar.innerHTML = "";
@@ -654,7 +635,6 @@ if(state.cats.includes("الأجهزة الكهربائية")){
     btn.classList.add("active");
   }
 
-  // شريط الأقسام الفرعية داخل الأجهزة الكهربائية
   function renderSubCatsBar(){
     const bar = $("subCatsBar");
 
@@ -677,7 +657,6 @@ if(state.cats.includes("الأجهزة الكهربائية")){
       return;
     }
 
-    // لا نعرضها إذا الأقسام الرئيسية نفسها مخفية
     if($("catsBar").style.display === "none"){ bar.style.display="none"; return; }
 
     bar.style.display = "flex";
@@ -689,7 +668,7 @@ if(state.cats.includes("الأجهزة الكهربائية")){
     all.onclick = ()=>{
       state.activeSub = "";
       setActiveBtn(bar, all);
-      renderBrandsBar(); // تحدّث البراندات حسب الفرعي
+      renderBrandsBar();
       renderProducts();
     };
     bar.appendChild(all);
@@ -700,7 +679,7 @@ if(state.cats.includes("الأجهزة الكهربائية")){
       btn.textContent = s;
       btn.onclick = ()=>{
         state.activeSub = s;
-        state.activeBrand = ""; // إعادة تعيين البراند عند تغيير الفرعي
+        state.activeBrand = "";
         setActiveBtn(bar, btn);
         renderBrandsBar();
         renderProducts();
@@ -709,7 +688,6 @@ if(state.cats.includes("الأجهزة الكهربائية")){
     });
   }
 
-  // شريط البراندات داخل الأجهزة الكهربائية (حسب الفرعي إن وجد)
   function renderBrandsBar(){
     const bar = $("brandsBar");
 
@@ -733,7 +711,6 @@ if(state.cats.includes("الأجهزة الكهربائية")){
       return;
     }
 
-    // لا نعرضها إذا الأقسام الرئيسية نفسها مخفية
     if($("catsBar").style.display === "none"){ bar.style.display="none"; return; }
 
     bar.style.display = "flex";
@@ -762,7 +739,6 @@ if(state.cats.includes("الأجهزة الكهربائية")){
     });
   }
 
-  // فلترة المنتجات
   function baseFilter(){
     const q = ($("q").value||"").toLowerCase().trim();
     const cat = state.activeCat;
@@ -771,12 +747,9 @@ if(state.cats.includes("الأجهزة الكهربائية")){
 
     return state.products.filter(p=>{
       const okC = !cat || p.category===cat;
-
-      // الفرعي والبراند فقط داخل الأجهزة الكهربائية
       const okSub = (cat !== "الأجهزة الكهربائية") || !sub || p.sub_category===sub;
       const okBr  = (cat !== "الأجهزة الكهربائية") || !br  || p.brand===br;
-
-      const okQ = !q || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
+      const okQ = !q || p.name.toLowerCase().includes(q) || (p.desc||"").toLowerCase().includes(q);
       return okC && okSub && okBr && okQ;
     });
   }
@@ -790,7 +763,6 @@ if(state.cats.includes("الأجهزة الكهربائية")){
       const hasDisc = p.old_price && p.old_price>p.price;
       const disc = hasDisc ? pct(p.old_price, p.price) : 0;
 
-      // عرض النص داخل البطاقة: نعرض الفرعي + البراند فقط للأجهزة الكهربائية
       let meta = p.category;
       if(p.category==="الأجهزة الكهربائية"){
         const parts = [];
@@ -826,7 +798,6 @@ if(state.cats.includes("الأجهزة الكهربائية")){
       grid.appendChild(card);
     });
 
-    // لو ماكو نتائج
     if(!list.length){
       grid.innerHTML = `<div class="mini" style="padding:14px;border:1px solid rgba(255,255,255,.10);border-radius:16px;background:rgba(255,255,255,.06)">
         لا توجد منتجات مطابقة للفلتر الحالي.
@@ -834,7 +805,6 @@ if(state.cats.includes("الأجهزة الكهربائية")){
     }
   }
 
-  // دخول المنتج للتفاصيل
   function openProduct(id){
     const p = state.products.find(x=>x.id===id);
     if(!p) return;
@@ -855,17 +825,18 @@ if(state.cats.includes("الأجهزة الكهربائية")){
       <img class="prodImg" src="${esc(p.image)}" onerror="this.style.display='none'">
       <div style="margin-top:12px; font-weight:1000; font-size:16px">${esc(p.name)}</div>
       <div class="mini" style="margin-top:6px">${esc(info)}</div>
-      <div class="mini" style="
-  margin-top:10px;
-  white-space:pre-wrap;
-  line-height:1.9;
-  font-size:14px;
-  overflow-wrap:anywhere;
-  word-break:break-word;
-">
-  ${esc(p.desc || "")}
-</div>
 
+      <!-- ✅ وصف واحد فقط + يظهر كامل -->
+      <div class="mini" style="
+        margin-top:10px;
+        white-space:pre-wrap;
+        line-height:1.9;
+        font-size:14px;
+        overflow-wrap:anywhere;
+        word-break:break-word;
+      ">
+        ${esc(p.desc || "")}
+      </div>
 
       <div style="margin-top:12px" class="row">
         <div class="price">${money(p.price)} د.ع</div>
@@ -883,7 +854,6 @@ if(state.cats.includes("الأجهزة الكهربائية")){
     $("prodDrawer").classList.add("open");
   }
 
-  // السلة
   function addToCart(id){
     state.cart[id] = (state.cart[id]||0) + 1;
     saveCart();
@@ -961,7 +931,6 @@ if(state.cats.includes("الأجهزة الكهربائية")){
   function removeItem(id){ delete state.cart[id]; saveCart(); renderCart(); }
   function clearCart(){ state.cart={}; saveCart(); renderCart(); }
 
-  // إرسال واتساب
   function sendWhatsApp(){
     const items = cartItems();
     if(!items.length){ alert("السلة فارغة"); return; }
