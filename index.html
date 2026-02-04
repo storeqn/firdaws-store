@@ -15,15 +15,12 @@
 
   <style>
     :root{
-      --bg:#0f1026;         /* نيلي غامق */
-      --bg2:#171a3a;        /* نيلي أفتح */
-      --paper:#ffffff;
-      --card:#121430;
-      --ink:#0b1220;
-      --text:#eef2ff;       /* نص فاتح */
+      --bg:#0f1026;
+      --bg2:#171a3a;
+      --text:#eef2ff;
       --muted:#b9c0ff;
       --line:rgba(255,255,255,.10);
-      --brand:#5b7cff;      /* نيلي/أزرق */
+      --brand:#5b7cff;
       --brand2:#3a5cff;
       --ok:#16a34a;
       --danger:#ef4444;
@@ -34,9 +31,11 @@
     body{
       margin:0;
       font-family:system-ui,"Segoe UI",Tahoma,Arial;
-      background: radial-gradient(1200px 600px at 50% -200px, rgba(91,124,255,.25), transparent 60%),
-                  linear-gradient(180deg, var(--bg), var(--bg2));
+      background:
+        radial-gradient(1200px 600px at 50% -200px, rgba(91,124,255,.25), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
       color:var(--text);
+      padding-bottom: 92px; /* مساحة لشريط السلة الثابت */
     }
     a{color:inherit; text-decoration:none}
     button,input,textarea{font-family:inherit}
@@ -69,25 +68,10 @@
       font-size:12px;
       color: rgba(185,192,255,.95);
     }
-
     .leftTools,.rightTools{display:flex; gap:8px; align-items:center}
     .leftTools{justify-self:start}
     .rightTools{justify-self:end}
 
-    .pill{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      border-radius:999px;
-      padding:10px 12px;
-      width:min(520px, 92vw);
-      display:flex; gap:10px; align-items:center;
-    }
-    .pill input{
-      border:0; outline:0; width:100%;
-      background:transparent; font-size:14px;
-      color:var(--text);
-    }
-    .pill input::placeholder{color: rgba(185,192,255,.75)}
     .iconBtn{
       border:1px solid var(--line);
       background: rgba(255,255,255,.06);
@@ -98,6 +82,7 @@
       display:flex; gap:8px; align-items:center;
       font-weight:1000;
       box-shadow: 0 10px 20px rgba(0,0,0,.18);
+      white-space:nowrap;
     }
     .badge{
       min-width:22px; height:22px; border-radius:999px;
@@ -107,11 +92,43 @@
       font-size:12px; font-weight:1000;
     }
 
-    /* Categories bar (text only) */
-    .cats{
-      max-width:1200px; margin:auto;
+    .pill{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      border-radius:999px;
+      padding:10px 12px;
+      width:min(520px, 92vw);
+      display:flex; gap:10px; align-items:center;
+      margin:0 auto 10px;
+    }
+    .pill input{
+      border:0; outline:0; width:100%;
+      background:transparent; font-size:14px;
+      color:var(--text);
+    }
+    .pill input::placeholder{color: rgba(185,192,255,.75)}
+
+    /* Bars (categories/subcategories/brands) */
+    .catsWrap{
+      max-width:1200px;
+      margin:auto;
       padding:0 12px 12px;
-      display:flex; gap:8px; overflow:auto;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .mini{
+      color: rgba(185,192,255,.85);
+      font-size:13px;
+      line-height:1.55;
+    }
+    .cats{
+      max-width:1200px;
+      margin:auto;
+      padding:0 12px 12px;
+      display:flex;
+      gap:8px;
+      overflow:auto;
     }
     .catBtn{
       white-space:nowrap;
@@ -153,6 +170,7 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
+    .posRel{position:relative}
     .img{
       width:100%;
       height:160px;
@@ -176,8 +194,14 @@
       color: rgba(185,192,255,.85);
       margin-top:6px;
     }
-    .row{display:flex; align-items:baseline; gap:8px; margin-top:10px; flex-wrap:wrap}
-    .price{font-weight:1000; color: #cfe0ff; font-size:14px}
+    .row{
+      display:flex;
+      align-items:baseline;
+      gap:8px;
+      margin-top:10px;
+      flex-wrap:wrap
+    }
+    .price{font-weight:1000; color:#cfe0ff; font-size:14px}
     .old{font-size:12px; color: rgba(185,192,255,.85); text-decoration:line-through}
 
     .btnRow{display:flex; gap:8px; margin-top:10px}
@@ -201,7 +225,6 @@
       color:#fff;
     }
 
-    .posRel{position:relative}
     .tag{
       position:absolute; top:10px; right:10px;
       background:rgba(239,68,68,.95);
@@ -236,6 +259,7 @@
       justify-content:space-between;
       gap:10px;
       padding:12px 12px;
+      cursor:pointer;
     }
     .cartBar .sum{
       display:flex;
@@ -246,7 +270,7 @@
     .cartBar .sum .t{font-size:12px; color: rgba(185,192,255,.85)}
     .cartBar .sum .v{font-weight:1000; font-size:14px}
     .cartBar .go{
-      border:0; cursor:pointer;
+      border:0;
       border-radius:14px;
       padding:12px 14px;
       font-weight:1000;
@@ -254,6 +278,7 @@
       background: linear-gradient(135deg, rgba(91,124,255,.95), rgba(58,92,255,.95));
       display:flex; gap:10px; align-items:center;
       white-space:nowrap;
+      pointer-events:none; /* حتى الشريط كله يفتح السلة */
     }
     .cartBar .go .b{
       background: rgba(255,255,255,.20);
@@ -266,6 +291,8 @@
 
     /* Drawers */
     .overlay{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; z-index:90}
+    .overlay.show{display:block}
+
     .drawer{
       position:fixed; top:0; left:0;
       height:100vh; width:min(440px, 94vw);
@@ -278,7 +305,6 @@
       border-right: 1px solid rgba(255,255,255,.10);
     }
     .drawer.open{transform:translateX(0)}
-    .overlay.show{display:block}
     .dHead{
       padding:14px;
       border-bottom:1px solid rgba(255,255,255,.10);
@@ -297,7 +323,6 @@
     .dBody{padding:14px; overflow:auto; flex:1}
     .dFoot{padding:14px; border-top:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.03)}
 
-    .mini{color: rgba(185,192,255,.85); font-size:13px; line-height:1.55}
     .form{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px}
     .form input, .form textarea{
       border:1px solid rgba(255,255,255,.14);
@@ -339,15 +364,34 @@
       border-bottom:1px solid rgba(255,255,255,.10);
       align-items:flex-start;
     }
-    .thumb{width:58px; height:58px; border-radius:14px; object-fit:contain; background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10)}
+    .thumb{
+      width:58px; height:58px;
+      border-radius:14px;
+      object-fit:contain;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10)
+    }
     .cMain{flex:1}
     .cName{font-weight:1000; font-size:13px}
     .cMeta{color: rgba(185,192,255,.80); font-size:12px; margin-top:6px}
     .qty{display:flex; gap:8px; align-items:center; margin-top:8px}
-    .qbtn{width:32px; height:32px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color:var(--text); cursor:pointer; font-weight:1000}
+    .qbtn{
+      width:32px; height:32px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:1000
+    }
 
     /* Product details drawer (right) */
-    #prodDrawer{left:auto; right:0; transform:translateX(110%); border-right:0; border-left:1px solid rgba(255,255,255,.10)}
+    #prodDrawer{
+      left:auto; right:0;
+      transform:translateX(110%);
+      border-right:0;
+      border-left:1px solid rgba(255,255,255,.10)
+    }
     #prodDrawer.open{transform:translateX(0)}
     .prodImg{
       width:100%;
@@ -377,14 +421,23 @@
     </div>
   </div>
 
-  <div style="display:flex; justify-content:center; padding:0 12px 10px">
-    <div class="pill">
-      🔎
-      <input id="q" placeholder="ابحث عن منتج..." />
-    </div>
+  <div class="pill">
+    🔎
+    <input id="q" placeholder="ابحث عن منتج..." />
   </div>
 
-  <div class="cats" id="catsBar"></div>
+  <!-- زر إظهار الأقسام (الأقسام مخفية افتراضيًا) -->
+  <div class="catsWrap">
+    <button class="iconBtn" type="button" onclick="toggleCats()">📂 الأقسام</button>
+    <div class="mini">اضغط لعرض الأقسام</div>
+  </div>
+
+  <!-- الأقسام الرئيسية -->
+  <div class="cats" id="catsBar" style="display:none"></div>
+
+  <!-- يظهر فقط داخل الأجهزة الكهربائية -->
+  <div class="cats" id="subCatsBar" style="display:none"></div>
+  <div class="cats" id="brandsBar" style="display:none"></div>
 </header>
 
 <div class="wrap">
@@ -399,14 +452,14 @@
 </div>
 
 <!-- Always visible cart bar -->
-<div class="cartBar" onclick="openCart()" role="button" aria-label="Open Cart">
+<div class="cartBar" onclick="openCart()">
   <div class="sum">
     <div class="t">إجمالي السلة</div>
     <div class="v" id="cartSum">0 د.ع</div>
   </div>
-  <button class="go" type="button">
+  <div class="go">
     فتح السلة <span class="b" id="cartQty">0</span>
-  </button>
+  </div>
 </div>
 
 <!-- Overlay + Drawer (Cart) -->
@@ -455,13 +508,32 @@
     products: [],
     cats: [],
     activeCat: "",
+    activeSub: "",
+    activeBrand: "",
     cart: loadCart()
   };
 
   function loadCart(){ try { return JSON.parse(localStorage.getItem("cart")||"{}"); } catch { return {}; } }
   function saveCart(){ localStorage.setItem("cart", JSON.stringify(state.cart)); updateCartUI(); }
 
-  // CSV parser يدعم النصوص التي تحتوي فاصلة داخل " "
+  // إظهار/إخفاء الأقسام الرئيسية
+  function toggleCats(){
+    const bar = $("catsBar");
+    const show = (bar.style.display === "none" || !bar.style.display);
+    bar.style.display = show ? "flex" : "none";
+
+    // عند الإخفاء، نخفي الشرائط الفرعية أيضًا
+    if(!show){
+      $("subCatsBar").style.display = "none";
+      $("brandsBar").style.display = "none";
+    }else{
+      // إذا القسم الحالي أجهزة كهربائية نعيد إظهار الشرائط حسب الحالة
+      renderSubCatsBar();
+      renderBrandsBar();
+    }
+  }
+
+  // CSV parser يدعم الفواصل داخل " "
   function parseCSV(text){
     const lines = text.trim().split(/\r?\n/);
     const headers = splitLine(lines[0]).map(x=>x.trim());
@@ -510,6 +582,8 @@
           discount_note: (r.discount_note||"").trim(),
           image: (r.image||"").trim(),
           category: (r.category||"غير مصنف").trim(),
+          sub_category: (r.sub_category||"").trim(),
+          brand: (r.brand||"").trim(),
           desc: (r.desc||"").trim()
         }))
         .filter(p=>p.id && p.name && p.price);
@@ -518,6 +592,8 @@
 
       $("status").textContent = `تم تحميل ${state.products.length} منتج`;
       renderCatsBar();
+      renderSubCatsBar();
+      renderBrandsBar();
       renderProducts();
       updateCartUI();
     }catch(e){
@@ -526,6 +602,7 @@
     }
   }
 
+  // الأقسام الرئيسية
   function renderCatsBar(){
     const bar = $("catsBar");
     bar.innerHTML = "";
@@ -533,31 +610,165 @@
     const allBtn = document.createElement("button");
     allBtn.className = "catBtn" + (!state.activeCat ? " active" : "");
     allBtn.textContent = "الكل";
-    allBtn.onclick = ()=>{ state.activeCat=""; setActiveCatButton(allBtn); renderProducts(); };
+    allBtn.onclick = ()=>{
+      state.activeCat = "";
+      state.activeSub = "";
+      state.activeBrand = "";
+      setActiveBtn(bar, allBtn);
+      renderSubCatsBar();
+      renderBrandsBar();
+      renderProducts();
+      scrollToShop();
+    };
     bar.appendChild(allBtn);
 
     state.cats.forEach(cat=>{
       const b = document.createElement("button");
-      b.className = "catBtn";
+      b.className = "catBtn" + (state.activeCat===cat ? " active" : "");
       b.textContent = cat;
-      b.onclick = ()=>{ state.activeCat=cat; setActiveCatButton(b); renderProducts(); };
+      b.onclick = ()=>{
+        state.activeCat = cat;
+        state.activeSub = "";
+        state.activeBrand = "";
+        setActiveBtn(bar, b);
+        renderSubCatsBar();
+        renderBrandsBar();
+        renderProducts();
+        scrollToShop();
+      };
       bar.appendChild(b);
     });
   }
 
-  function setActiveCatButton(btn){
-    [...$("catsBar").children].forEach(x=>x.classList.remove("active"));
+  function setActiveBtn(container, btn){
+    [...container.children].forEach(x=>x.classList.remove("active"));
     btn.classList.add("active");
-    scrollToShop();
   }
 
+  // شريط الأقسام الفرعية داخل الأجهزة الكهربائية
+  function renderSubCatsBar(){
+    const bar = $("subCatsBar");
+
+    if(state.activeCat !== "الأجهزة الكهربائية"){
+      bar.style.display = "none";
+      state.activeSub = "";
+      return;
+    }
+
+    const subs = [...new Set(
+      state.products
+        .filter(p=>p.category==="الأجهزة الكهربائية")
+        .map(p=>p.sub_category)
+        .filter(Boolean)
+    )].sort((a,b)=>a.localeCompare(b,"ar"));
+
+    if(!subs.length){
+      bar.style.display = "none";
+      state.activeSub = "";
+      return;
+    }
+
+    // لا نعرضها إذا الأقسام الرئيسية نفسها مخفية
+    if($("catsBar").style.display === "none"){ bar.style.display="none"; return; }
+
+    bar.style.display = "flex";
+    bar.innerHTML = "";
+
+    const all = document.createElement("button");
+    all.className = "catBtn" + (!state.activeSub ? " active" : "");
+    all.textContent = "كل الأنواع";
+    all.onclick = ()=>{
+      state.activeSub = "";
+      setActiveBtn(bar, all);
+      renderBrandsBar(); // تحدّث البراندات حسب الفرعي
+      renderProducts();
+    };
+    bar.appendChild(all);
+
+    subs.forEach(s=>{
+      const btn = document.createElement("button");
+      btn.className = "catBtn" + (state.activeSub===s ? " active" : "");
+      btn.textContent = s;
+      btn.onclick = ()=>{
+        state.activeSub = s;
+        state.activeBrand = ""; // إعادة تعيين البراند عند تغيير الفرعي
+        setActiveBtn(bar, btn);
+        renderBrandsBar();
+        renderProducts();
+      };
+      bar.appendChild(btn);
+    });
+  }
+
+  // شريط البراندات داخل الأجهزة الكهربائية (حسب الفرعي إن وجد)
+  function renderBrandsBar(){
+    const bar = $("brandsBar");
+
+    if(state.activeCat !== "الأجهزة الكهربائية"){
+      bar.style.display = "none";
+      state.activeBrand = "";
+      return;
+    }
+
+    const brands = [...new Set(
+      state.products
+        .filter(p=>p.category==="الأجهزة الكهربائية")
+        .filter(p=>!state.activeSub || p.sub_category===state.activeSub)
+        .map(p=>p.brand)
+        .filter(Boolean)
+    )].sort((a,b)=>a.localeCompare(b,"en"));
+
+    if(!brands.length){
+      bar.style.display = "none";
+      state.activeBrand = "";
+      return;
+    }
+
+    // لا نعرضها إذا الأقسام الرئيسية نفسها مخفية
+    if($("catsBar").style.display === "none"){ bar.style.display="none"; return; }
+
+    bar.style.display = "flex";
+    bar.innerHTML = "";
+
+    const all = document.createElement("button");
+    all.className = "catBtn" + (!state.activeBrand ? " active" : "");
+    all.textContent = "كل الشركات";
+    all.onclick = ()=>{
+      state.activeBrand = "";
+      setActiveBtn(bar, all);
+      renderProducts();
+    };
+    bar.appendChild(all);
+
+    brands.forEach(b=>{
+      const btn = document.createElement("button");
+      btn.className = "catBtn" + (state.activeBrand===b ? " active" : "");
+      btn.textContent = b;
+      btn.onclick = ()=>{
+        state.activeBrand = b;
+        setActiveBtn(bar, btn);
+        renderProducts();
+      };
+      bar.appendChild(btn);
+    });
+  }
+
+  // فلترة المنتجات
   function baseFilter(){
     const q = ($("q").value||"").toLowerCase().trim();
     const cat = state.activeCat;
+    const sub = state.activeSub;
+    const br  = state.activeBrand;
+
     return state.products.filter(p=>{
       const okC = !cat || p.category===cat;
+
+      // الفرعي والبراند فقط داخل الأجهزة الكهربائية
+      const okSub = (cat !== "الأجهزة الكهربائية") || !sub || p.sub_category===sub;
+      const okBr  = (cat !== "الأجهزة الكهربائية") || !br  || p.brand===br;
+
       const okQ = !q || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
-      return okC && okQ;
+      return okC && okSub && okBr && okQ;
     });
   }
 
@@ -570,6 +781,15 @@
       const hasDisc = p.old_price && p.old_price>p.price;
       const disc = hasDisc ? pct(p.old_price, p.price) : 0;
 
+      // عرض النص داخل البطاقة: نعرض الفرعي + البراند فقط للأجهزة الكهربائية
+      let meta = p.category;
+      if(p.category==="الأجهزة الكهربائية"){
+        const parts = [];
+        if(p.sub_category) parts.push(p.sub_category);
+        if(p.brand) parts.push(p.brand);
+        if(parts.length) meta = parts.join(" • ");
+      }
+
       const card = document.createElement("div");
       card.className = "card posRel";
       card.innerHTML = `
@@ -581,7 +801,7 @@
 
         <div class="p">
           <div class="name" onclick="openProduct('${p.id}')">${esc(p.name)}</div>
-          <div class="cat">${esc(p.category)}</div>
+          <div class="cat">${esc(meta)}</div>
 
           <div class="row">
             <div class="price">${money(p.price)} د.ع</div>
@@ -596,6 +816,13 @@
       `;
       grid.appendChild(card);
     });
+
+    // لو ماكو نتائج
+    if(!list.length){
+      grid.innerHTML = `<div class="mini" style="padding:14px;border:1px solid rgba(255,255,255,.10);border-radius:16px;background:rgba(255,255,255,.06)">
+        لا توجد منتجات مطابقة للفلتر الحالي.
+      </div>`;
+    }
   }
 
   // دخول المنتج للتفاصيل
@@ -606,16 +833,25 @@
     const hasDisc = p.old_price && p.old_price>p.price;
     const disc = hasDisc ? pct(p.old_price, p.price) : 0;
 
+    let info = p.category;
+    if(p.category==="الأجهزة الكهربائية"){
+      const parts = [];
+      if(p.sub_category) parts.push(p.sub_category);
+      if(p.brand) parts.push(p.brand);
+      if(parts.length) info = parts.join(" • ");
+    }
+
     $("pTitle").textContent = p.name;
     $("pBody").innerHTML = `
       <img class="prodImg" src="${esc(p.image)}" onerror="this.style.display='none'">
       <div style="margin-top:12px; font-weight:1000; font-size:16px">${esc(p.name)}</div>
-      <div class="mini" style="margin-top:8px">${esc(p.desc || "")}</div>
+      <div class="mini" style="margin-top:6px">${esc(info)}</div>
+      <div class="mini" style="margin-top:10px">${esc(p.desc || "")}</div>
 
       <div style="margin-top:12px" class="row">
         <div class="price">${money(p.price)} د.ع</div>
         ${hasDisc ? `<div class="old">${money(p.old_price)} د.ع</div>` : ``}
-        ${hasDisc ? `<div class="badge" style="height:auto;padding:4px 10px">خصم ${disc}%</div>` : ``}
+        ${hasDisc ? `<span class="badge" style="height:auto;padding:4px 10px">خصم ${disc}%</span>` : ``}
       </div>
 
       <div class="btnRow" style="margin-top:14px">
@@ -755,7 +991,7 @@
     $("prodDrawer").classList.remove("open");
   }
 
-  function scrollToShop(){ document.getElementById("shopTop").scrollIntoView({behavior:"smooth"}); }
+  function scrollToShop(){ $("shopTop").scrollIntoView({behavior:"smooth"}); }
 
   $("q").addEventListener("input", renderProducts);
 
