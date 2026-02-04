@@ -261,16 +261,59 @@
     out.push(cur);
     return out;
   }
-  function parseCSV(text){
-    const lines = text.trim().split(/\r?\n/);
-    const headers = splitCSVLine(lines[0]).map(h=>h.trim());
-    return lines.slice(1).map(line=>{
-      const cols = splitCSVLine(line);
-      const obj = {};
-      headers.forEach((h,i)=>obj[h]= (cols[i]||"").trim());
-      return obj;
-    });
+  // CSV parser قوي: يدعم الفواصل + الاقتباس + الأسطر داخل الخلايا
+function parseCSV(text){
+  const rows = [];
+  let row = [];
+  let cur = "";
+  let inQ = false;
+
+  for(let i=0;i<text.length;i++){
+    const ch = text[i];
+    const next = text[i+1];
+
+    if(ch === '"'){
+      // "" داخل النص = "
+      if(inQ && next === '"'){
+        cur += '"';
+        i++;
+      }else{
+        inQ = !inQ;
+      }
+      continue;
+    }
+
+    // فاصلة تنهي خانة فقط إذا مو داخل اقتباس
+    if(ch === "," && !inQ){
+      row.push(cur);
+      cur = "";
+      continue;
+    }
+
+    // سطر جديد ينهي صف فقط إذا مو داخل اقتباس
+    if((ch === "\n" || ch === "\r") && !inQ){
+      if(ch === "\r" && next === "\n") i++; // CRLF
+      row.push(cur);
+      cur = "";
+      if(row.some(v => String(v).trim() !== "")) rows.push(row);
+      row = [];
+      continue;
+    }
+
+    cur += ch;
   }
+
+  // آخر صف
+  row.push(cur);
+  if(row.some(v => String(v).trim() !== "")) rows.push(row);
+
+  const headers = rows.shift().map(h => String(h||"").trim());
+  return rows.map(cols=>{
+    const obj = {};
+    headers.forEach((h,idx)=> obj[h] = (cols[idx] ?? "").toString().trim());
+    return obj;
+  });
+}
 
   function money(n){ return (Number(n)||0).toLocaleString("ar-IQ"); }
   function esc(s){ return String(s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
