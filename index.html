@@ -521,26 +521,60 @@
     }
   }
 
-  function parseCSV(text){
-    const lines = text.trim().split(/\r?\n/);
-    const headers = splitLine(lines[0]).map(x=>x.trim());
-    return lines.slice(1).map(line=>{
-      const cols = splitLine(line);
-      const obj = {};
-      headers.forEach((h,i)=>obj[h]=(cols[i]||"").trim());
-      return obj;
-    });
-  }
-  function splitLine(line){
-    const out=[]; let cur=""; let inQ=false;
-    for (let i=0;i<line.length;i++){
-      const c=line[i];
-      if (c === '"'){ inQ=!inQ; continue; }
-      if (c === "," && !inQ){ out.push(cur); cur=""; continue; }
-      cur += c;
+  // CSV parser قوي يدعم الفواصل + علامات الاقتباس + الأسطر داخل الخلية
+function parseCSV(text){
+  const rows = [];
+  let row = [];
+  let cur = "";
+  let inQ = false;
+
+  for(let i=0;i<text.length;i++){
+    const ch = text[i];
+    const next = text[i+1];
+
+    if(ch === '"'){
+      // "" داخل النص معناها " حرف اقتباس
+      if(inQ && next === '"'){
+        cur += '"';
+        i++;
+      }else{
+        inQ = !inQ;
+      }
+      continue;
     }
-    out.push(cur);
-    return out;
+
+    // فاصلة تنهي خانة فقط إذا مو داخل اقتباس
+    if(ch === ',' && !inQ){
+      row.push(cur);
+      cur = "";
+      continue;
+    }
+
+    // سطر جديد ينهي صف فقط إذا مو داخل اقتباس
+    if((ch === '\n' || ch === '\r') && !inQ){
+      if(ch === '\r' && next === '\n') i++; // تجاوز CRLF
+      row.push(cur);
+      cur = "";
+      // نتجنب الصفوف الفارغة
+      if(row.some(v => String(v).trim() !== "")) rows.push(row);
+      row = [];
+      continue;
+    }
+
+    cur += ch;
+  }
+
+  // آخر قيمة
+  row.push(cur);
+  if(row.some(v => String(v).trim() !== "")) rows.push(row);
+
+  const headers = rows.shift().map(h => String(h||"").trim());
+  return rows.map(cols=>{
+    const obj = {};
+    headers.forEach((h,idx)=> obj[h] = (cols[idx] ?? "").toString());
+    return obj;
+  });
+}
   }
 
   function money(n){ return (Number(n)||0).toLocaleString("ar-IQ"); }
