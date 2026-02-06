@@ -393,6 +393,20 @@ header{
   padding-right: calc(12px + var(--safe-right));
 }
         
+        :root{
+  --safe-top: env(safe-area-inset-top);
+}
+
+/* أي نافذة/سلة/تفاصيل ثابتة بالأعلى: نخليها تنزل شوي */
+#cartDrawer, #prodDrawer, .drawer, .modal, .sheet {
+  padding-top: calc(12px + var(--safe-top));
+}
+
+/* زر الإغلاق نفسه إذا كان مثبت بالأعلى */
+.closeBtn, .close, .btnClose, .drawerClose, .modalClose {
+  top: calc(10px + var(--safe-top)) !important;
+}
+        
       </style>
 </head>
 
