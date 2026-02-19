@@ -1,14 +1,38 @@
 {
-  "name": "معرض الفردوس",
-  "short_name": "الفردوس",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#f6f8ff",
-  "theme_color": "#0b3bbd",
-  "lang": "ar",
-  "dir": "rtl",
-  "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
-  ]
+“name”: “معرض الفردوس”,
+“short_name”: “الفردوس”,
+“description”: “متجر الهواتف والأجهزة الكهربائية”,
+“start_url”: “./”,
+“display”: “standalone”,
+“orientation”: “portrait”,
+“background_color”: “#08080f”,
+“theme_color”: “#08080f”,
+“lang”: “ar”,
+“dir”: “rtl”,
+“scope”: “./”,
+“categories”: [“shopping”, “electronics”],
+“icons”: [
+{
+“src”: “icons/icon-192.png”,
+“sizes”: “192x192”,
+“type”: “image/png”,
+“purpose”: “any maskable”
+},
+{
+“src”: “icons/icon-512.png”,
+“sizes”: “512x512”,
+“type”: “image/png”,
+“purpose”: “any maskable”
+}
+],
+“shortcuts”: [
+{
+“name”: “المنتجات”,
+“short_name”: “المنتجات”,
+“description”: “تصفح جميع المنتجات”,
+“url”: “./”
+}
+],
+“screenshots”: [],
+“prefer_related_applications”: false
 }
