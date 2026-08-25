@@ -27,7 +27,7 @@ function headerInfo_(sheet){
 }
 
 function ensureHeaders_(sheet){
-  const required=['id','name','price','old_price','offer','discount_note','image','category','sub_category','brand','desc','images','featured','stock','active'];
+  const required=['id','name','price','old_price','offer','discount_note','image','category','sub_category','brand','brand_logo','desc','images','featured','stock','active'];
   let info=headerInfo_(sheet);
   required.forEach(h=>{if(info.idx[h]===undefined){sheet.getRange(1,sheet.getLastColumn()+1).setValue(h);info=headerInfo_(sheet);}});
   sheet.setFrozenRows(1);SpreadsheetApp.flush();return headerInfo_(sheet);
