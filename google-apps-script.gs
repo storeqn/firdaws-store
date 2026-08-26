@@ -4,8 +4,17 @@ const PRODUCTS_SHEET='الورقة1';
 const BRANDS_SHEET='Brands';
 
 function doGet(e){
-  const action=String((e&&e.parameter&&e.parameter.action)||'').trim().toLowerCase();
+  const p=(e&&e.parameter)||{};
+  const action=String(p.action||'').trim().toLowerCase();
   if(action==='brands') return json_({success:true,brands:listBrands_()});
+  if(action==='brand_upsert'){
+    const lock=LockService.getScriptLock();lock.waitLock(20000);
+    try{return upsertBrand_(p);}catch(err){return json_({success:false,error:String(err.message||err)});}finally{lock.releaseLock();}
+  }
+  if(action==='brand_delete'){
+    const lock=LockService.getScriptLock();lock.waitLock(20000);
+    try{return deleteBrand_(p);}catch(err){return json_({success:false,error:String(err.message||err)});}finally{lock.releaseLock();}
+  }
   return json_({success:true,message:'Firdaws Store API is working'});
 }
 
