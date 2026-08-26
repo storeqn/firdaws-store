@@ -1,6 +1,6 @@
 // معرض الفردوس - Service Worker
-const STATIC_CACHE='firdaws-static-v5';
-const IMG_CACHE='firdaws-images-v5';
+const STATIC_CACHE='firdaws-static-v6';
+const IMG_CACHE='firdaws-images-v6';
 const STATIC_ASSETS=['./manifest.json','./icons/icon-192.png','./icons/icon-512.png'];
 
 self.addEventListener('install',event=>{
@@ -16,15 +16,20 @@ self.addEventListener('fetch',event=>{
   if(request.method!=='GET'||!request.url.startsWith('http'))return;
   const url=new URL(request.url);
 
-  // Never cache Google Sheets CSV. Product data must always be current.
+  // Never cache Google data or admin HTML pages.
   if(url.hostname.includes('docs.google.com')||url.hostname.includes('googleusercontent.com')){
     event.respondWith(fetch(request,{cache:'no-store'}));
     return;
   }
 
-  // Always request the newest HTML so old app-shell code cannot get stuck on iPhone.
-  if(request.mode==='navigate'||url.pathname.endsWith('/index.html')||url.pathname.endsWith('/firdaws-store/')){
-    event.respondWith(fetch(request,{cache:'no-store'}).catch(()=>caches.match('./index.html')));
+  if(
+    request.mode==='navigate' ||
+    url.pathname.endsWith('/index.html') ||
+    url.pathname.endsWith('/admin.html') ||
+    url.pathname.endsWith('/brands-admin.html') ||
+    url.pathname.endsWith('/firdaws-store/')
+  ){
+    event.respondWith(fetch(request,{cache:'no-store'}).catch(()=>caches.match(request)));
     return;
   }
 
@@ -46,7 +51,7 @@ async function cacheFirst(request,cacheName){
 
 async function networkFirst(request,cacheName){
   try{
-    const response=await fetch(request);
+    const response=await fetch(request,{cache:'no-store'});
     if(response&&response.ok){const cache=await caches.open(cacheName);cache.put(request,response.clone()).catch(()=>{});}
     return response;
   }catch{
