@@ -53,24 +53,25 @@ $('form').onsubmit=async e=>{
     desc:$('desc').value.trim()
   };
   $('save').disabled=true;
-  $('status').textContent=wasEditing?'جاري حفظ التعديلات والتحقق منها...':'جاري إضافة المنتج والتحقق منه...';
+  $('status').textContent=wasEditing?'جاري حفظ التعديلات...':'جاري إضافة المنتج...';
   $('status').className='status wait';
   try{
     await fetch(SCRIPT_URL,{method:'POST',body:new URLSearchParams(s),mode:'no-cors',keepalive:true});
     optimisticRow(s);
-    $('status').textContent='تم إرسال البيانات إلى Google Sheets، جاري تأكيد الحفظ...';
-    const ok=await verifySaved(submittedId,s,wasEditing);
-    if(ok){
-      $('status').textContent='✓ تم الحفظ والتأكد من التعديل';
-      $('status').className='status ok';
-      $('save').disabled=false;
-      setTimeout(()=>{reset();show('list')},700);
-    }else{
-      $('status').textContent='⚠️ لم يتم تأكيد التعديل في Google Sheets. لم نعد نعرض رسالة نجاح وهمية. اضغط حفظ مرة أخرى، وإذا استمرت المشكلة فالعطل من Google Apps Script.';
-      $('status').className='status err';
-      $('save').disabled=false;
-      $('save').textContent=wasEditing?'إعادة حفظ التعديلات':'+ إضافة المنتج';
-    }
+    $('status').textContent='✓ تم إرسال الحفظ';
+    $('status').className='status ok';
+    $('save').disabled=false;
+    reset();
+    show('list');
+    $('count').textContent=wasEditing?'✓ تم إرسال التعديل — جاري التأكيد بالخلفية':'✓ تم إرسال المنتج — جاري التحديث بالخلفية';
+    verifySaved(submittedId,s,wasEditing).then(ok=>{
+      if(ok){
+        $('count').textContent=(wasEditing?'✅ تم تأكيد التعديل':'✅ تم تأكيد إضافة المنتج')+' — '+data.length+' منتج';
+        setTimeout(render,1800);
+      }else{
+        $('count').textContent='⚠️ تم الإرسال لكن لم يتم تأكيده بعد — اضغط ↻ بعد لحظات';
+      }
+    }).catch(()=>{});
   }catch(err){
     $('status').textContent='تعذر إرسال الحفظ. تحقق من الإنترنت وحاول مرة أخرى.';
     $('status').className='status err';
