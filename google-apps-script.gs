@@ -52,10 +52,7 @@ function doGet(e){
     }
   }
 
-  if(action==='debug'){
-    return json_({success:true,rows:listDebug_()});
-  }
-
+  if(action==='debug')return json_({success:true,rows:listDebug_()});
   return json_({success:true,message:'Firdaws Store API is working'});
 }
 
@@ -63,24 +60,13 @@ function doPost(e){
   const lock=LockService.getScriptLock();
   lock.waitLock(20000);
   try{
-    if(!e||!e.parameter) throw new Error('No request data received');
+    if(!e||!e.parameter)throw new Error('No request data received');
     const p=e.parameter;
     const action=String(p.action||'add').trim().toLowerCase();
     safeDebug_('POST','received',p,'');
 
-    if(action==='brand_upsert'){
-      safeDebug_('POST','brand_upsert_start',p,'');
-      const out=upsertBrand_(p);
-      safeDebug_('POST','brand_upsert_ok',p,'saved');
-      return out;
-    }
-
-    if(action==='brand_delete'){
-      safeDebug_('POST','brand_delete_start',p,'');
-      const out=deleteBrand_(p);
-      safeDebug_('POST','brand_delete_ok',p,'deleted');
-      return out;
-    }
+    if(action==='brand_upsert')return upsertBrand_(p);
+    if(action==='brand_delete')return deleteBrand_(p);
 
     const sheet=getProductsSheet_();
     const info=ensureProductHeaders_(sheet);
@@ -90,9 +76,7 @@ function doPost(e){
   }catch(err){
     safeDebug_('POST','error',(e&&e.parameter)||{},String(err.message||err));
     return json_({success:false,error:String(err.message||err)});
-  }finally{
-    lock.releaseLock();
-  }
+  }finally{lock.releaseLock();}
 }
 
 function getSS_(){return SpreadsheetApp.openById(SPREADSHEET_ID);}
@@ -128,23 +112,13 @@ function safeDebug_(method,stage,p,message){
   try{
     const s=getDebugSheet_();
     const now=Utilities.formatDate(new Date(),Session.getScriptTimeZone()||'Asia/Baghdad','yyyy-MM-dd HH:mm:ss');
-    s.appendRow([
-      now,
-      String(method||''),
-      String(stage||''),
-      String((p&&p.action)||''),
-      String((p&&p.name)||''),
-      String((p&&p.logo)||''),
-      String((p&&p.old_name)||''),
-      String(message||'')
-    ]);
+    s.appendRow([now,String(method||''),String(stage||''),String((p&&p.action)||''),String((p&&p.name)||''),String((p&&p.logo)||''),String((p&&p.old_name)||''),String(message||'')]);
     SpreadsheetApp.flush();
   }catch(_){ }
 }
 
 function listDebug_(){
-  const s=getDebugSheet_();
-  const last=s.getLastRow();
+  const s=getDebugSheet_(),last=s.getLastRow();
   if(last<2)return[];
   const start=Math.max(2,last-49);
   return s.getRange(start,1,last-start+1,8).getDisplayValues();
@@ -153,177 +127,69 @@ function listDebug_(){
 function headerInfo_(sheet){
   const n=Math.max(1,sheet.getLastColumn());
   const headers=sheet.getRange(1,1,1,n).getDisplayValues()[0].map(x=>String(x).trim());
-  const idx={};
-  headers.forEach((h,i)=>{if(h)idx[h.toLowerCase()]=i});
+  const idx={};headers.forEach((h,i)=>{if(h)idx[h.toLowerCase()]=i});
   return {headers,idx};
 }
 
 function ensureProductHeaders_(sheet){
-  const required=['id','name','price','old_price','offer','discount_note','image','category','sub_category','brand','brand_logo','desc','images','featured','stock','active'];
+  const required=['id','name','price','old_price','offer','discount_note','image','category','sub_category','brand','brand_logo','desc','images','featured','stock','active','options'];
   let info=headerInfo_(sheet);
-  required.forEach(h=>{
-    if(info.idx[h]===undefined){
-      sheet.getRange(1,sheet.getLastColumn()+1).setValue(h);
-      info=headerInfo_(sheet);
-    }
-  });
-  sheet.setFrozenRows(1);
-  SpreadsheetApp.flush();
-  return headerInfo_(sheet);
+  required.forEach(h=>{if(info.idx[h]===undefined){sheet.getRange(1,sheet.getLastColumn()+1).setValue(h);info=headerInfo_(sheet);}});
+  sheet.setFrozenRows(1);SpreadsheetApp.flush();return headerInfo_(sheet);
 }
 
 function listBrands_(){
-  const s=getBrandsSheet_();
-  const last=s.getLastRow();
-  if(last<2)return[];
-  return s.getRange(2,1,last-1,3).getDisplayValues()
-    .filter(r=>String(r[0]).trim())
-    .map(r=>({name:String(r[0]).trim(),logo:String(r[1]).trim(),updated_at:String(r[2]).trim()}));
+  const s=getBrandsSheet_(),last=s.getLastRow();if(last<2)return[];
+  return s.getRange(2,1,last-1,3).getDisplayValues().filter(r=>String(r[0]).trim()).map(r=>({name:String(r[0]).trim(),logo:String(r[1]).trim(),updated_at:String(r[2]).trim()}));
 }
 
 function findBrandLogo_(name){
-  const key=String(name||'').trim().toLowerCase();
-  if(!key)return'';
-  const b=listBrands_().find(x=>x.name.toLowerCase()===key);
-  return b?b.logo:'';
+  const key=String(name||'').trim().toLowerCase();if(!key)return'';
+  const b=listBrands_().find(x=>x.name.toLowerCase()===key);return b?b.logo:'';
 }
 
 function upsertBrand_(p){
-  const name=String(p.name||'').trim();
-  const logo=String(p.logo||'').trim();
-  const oldName=String(p.old_name||'').trim();
-
-  safeDebug_('CORE','upsert_validate',p,'name='+(name?'ok':'missing')+', logo='+(logo?'ok':'missing'));
-  if(!name)throw new Error('Missing brand name');
-  if(!logo)throw new Error('Missing brand logo');
-
-  const s=getBrandsSheet_();
-  safeDebug_('CORE','brands_sheet_ready',p,'sheet='+s.getName());
-
-  const last=s.getLastRow();
-  const rows=last>=2?s.getRange(2,1,last-1,3).getDisplayValues():[];
-  const keys=[oldName,name].filter(Boolean).map(x=>x.toLowerCase());
-  let target=-1;
-
-  for(let i=0;i<rows.length;i++){
-    if(keys.includes(String(rows[i][0]).trim().toLowerCase())){
-      target=i+2;
-      break;
-    }
-  }
-
+  const name=String(p.name||'').trim(),logo=String(p.logo||'').trim(),oldName=String(p.old_name||'').trim();
+  if(!name)throw new Error('Missing brand name');if(!logo)throw new Error('Missing brand logo');
+  const s=getBrandsSheet_(),last=s.getLastRow(),rows=last>=2?s.getRange(2,1,last-1,3).getDisplayValues():[],keys=[oldName,name].filter(Boolean).map(x=>x.toLowerCase());
+  let target=-1;for(let i=0;i<rows.length;i++){if(keys.includes(String(rows[i][0]).trim().toLowerCase())){target=i+2;break;}}
   const now=Utilities.formatDate(new Date(),Session.getScriptTimeZone()||'Asia/Baghdad','yyyy-MM-dd HH:mm:ss');
-
-  if(target<0){
-    safeDebug_('CORE','before_append',p,'lastRow='+last);
-    s.appendRow([name,logo,now]);
-    SpreadsheetApp.flush();
-    safeDebug_('CORE','after_append',p,'newLastRow='+s.getLastRow());
-  }else{
-    safeDebug_('CORE','before_update_row',p,'row='+target);
-    s.getRange(target,1,1,3).setValues([[name,logo,now]]);
-    SpreadsheetApp.flush();
-    safeDebug_('CORE','after_update_row',p,'row='+target);
-  }
-
-  propagateBrandLogo_(oldName||name,name,logo);
-  SpreadsheetApp.flush();
-
-  const verify=listBrands_().find(x=>x.name.toLowerCase()===name.toLowerCase());
-  if(!verify||String(verify.logo||'').trim()!==logo){
-    safeDebug_('CORE','verify_failed',p,'brand row not found after write');
-    throw new Error('Brand write verification failed');
-  }
-
-  safeDebug_('CORE','verify_ok',p,'saved');
+  if(target<0)s.appendRow([name,logo,now]);else s.getRange(target,1,1,3).setValues([[name,logo,now]]);
+  SpreadsheetApp.flush();propagateBrandLogo_(oldName||name,name,logo);SpreadsheetApp.flush();
+  const verify=listBrands_().find(x=>x.name.toLowerCase()===name.toLowerCase());if(!verify||String(verify.logo||'').trim()!==logo)throw new Error('Brand write verification failed');
   return json_({success:true,action:'brand_upsert',name,logo});
 }
 
 function deleteBrand_(p){
-  const name=String(p.name||'').trim();
-  if(!name)throw new Error('Missing brand name');
-  const s=getBrandsSheet_();
-  const last=s.getLastRow();
-  if(last>=2){
-    const rows=s.getRange(2,1,last-1,1).getDisplayValues();
-    for(let i=rows.length-1;i>=0;i--){
-      if(String(rows[i][0]).trim().toLowerCase()===name.toLowerCase())s.deleteRow(i+2);
-    }
-  }
-  propagateBrandLogo_(name,name,'');
-  SpreadsheetApp.flush();
-  return json_({success:true,action:'brand_delete',name});
+  const name=String(p.name||'').trim();if(!name)throw new Error('Missing brand name');
+  const s=getBrandsSheet_(),last=s.getLastRow();if(last>=2){const rows=s.getRange(2,1,last-1,1).getDisplayValues();for(let i=rows.length-1;i>=0;i--)if(String(rows[i][0]).trim().toLowerCase()===name.toLowerCase())s.deleteRow(i+2);}
+  propagateBrandLogo_(name,name,'');SpreadsheetApp.flush();return json_({success:true,action:'brand_delete',name});
 }
 
 function propagateBrandLogo_(oldName,newName,logo){
-  const s=getProductsSheet_();
-  const info=ensureProductHeaders_(s);
-  const last=s.getLastRow();
-  if(last<2)return;
-  const range=s.getRange(2,1,last-1,info.headers.length);
-  const rows=range.getValues();
-  const oldKey=String(oldName||'').trim().toLowerCase();
-  const newKey=String(newName||'').trim().toLowerCase();
-  let changed=false;
-  rows.forEach(r=>{
-    const b=String(r[info.idx.brand]||'').trim().toLowerCase();
-    if(b===oldKey||b===newKey){
-      if(oldKey&&oldKey!==newKey)r[info.idx.brand]=newName;
-      r[info.idx.brand_logo]=logo;
-      changed=true;
-    }
-  });
+  const s=getProductsSheet_(),info=ensureProductHeaders_(s),last=s.getLastRow();if(last<2)return;
+  const range=s.getRange(2,1,last-1,info.headers.length),rows=range.getValues(),oldKey=String(oldName||'').trim().toLowerCase(),newKey=String(newName||'').trim().toLowerCase();let changed=false;
+  rows.forEach(r=>{const b=String(r[info.idx.brand]||'').trim().toLowerCase();if(b===oldKey||b===newKey){if(oldKey&&oldKey!==newKey)r[info.idx.brand]=newName;r[info.idx.brand_logo]=logo;changed=true;}});
   if(changed)range.setValues(rows);
 }
 
 function fillBrandLogo_(row,info,p){
   const brand=String((info.idx.brand!==undefined?row[info.idx.brand]:'')||p.brand||'').trim();
-  if(info.idx.brand_logo!==undefined){
-    const sent=String(p.brand_logo||'').trim();
-    row[info.idx.brand_logo]=sent||findBrandLogo_(brand)||row[info.idx.brand_logo]||'';
-  }
+  if(info.idx.brand_logo!==undefined){const sent=String(p.brand_logo||'').trim();row[info.idx.brand_logo]=sent||findBrandLogo_(brand)||row[info.idx.brand_logo]||'';}
 }
 
 function addProduct_(sheet,info,p){
-  const row=new Array(info.headers.length).fill('');
-  const id=String(p.id||'').trim()||String(Date.now());
-  row[info.idx.id]=id;
-  Object.keys(p).forEach(k=>{
-    const key=String(k).toLowerCase();
-    if(key==='action'||key==='id')return;
-    if(info.idx[key]!==undefined)row[info.idx[key]]=p[k];
-  });
-  fillBrandLogo_(row,info,p);
-  sheet.appendRow(row);
-  SpreadsheetApp.flush();
-  return json_({success:true,action:'add',id});
+  const row=new Array(info.headers.length).fill(''),id=String(p.id||'').trim()||String(Date.now());row[info.idx.id]=id;
+  Object.keys(p).forEach(k=>{const key=String(k).toLowerCase();if(key==='action'||key==='id')return;if(info.idx[key]!==undefined)row[info.idx[key]]=p[k];});
+  fillBrandLogo_(row,info,p);sheet.appendRow(row);SpreadsheetApp.flush();return json_({success:true,action:'add',id});
 }
 
 function updateProduct_(sheet,info,p){
-  const id=String(p.id||'').trim();
-  if(!id)throw new Error('Missing product id');
-  const last=sheet.getLastRow();
-  if(last<2)throw new Error('No products found');
-  const ids=sheet.getRange(2,info.idx.id+1,last-1,1).getDisplayValues();
-  let target=-1;
-  for(let i=0;i<ids.length;i++){
-    if(String(ids[i][0]).trim()===id){target=i+2;break;}
-  }
-  if(target<0)throw new Error('Product not found: '+id);
-  const range=sheet.getRange(target,1,1,info.headers.length);
-  const row=range.getValues()[0];
-  Object.keys(p).forEach(k=>{
-    const key=String(k).toLowerCase();
-    if(key==='action'||key==='id')return;
-    if(info.idx[key]!==undefined)row[info.idx[key]]=p[k];
-  });
-  row[info.idx.id]=id;
-  fillBrandLogo_(row,info,p);
-  range.setValues([row]);
-  SpreadsheetApp.flush();
-  return json_({success:true,action:'update',id,row:target});
+  const id=String(p.id||'').trim();if(!id)throw new Error('Missing product id');const last=sheet.getLastRow();if(last<2)throw new Error('No products found');
+  const ids=sheet.getRange(2,info.idx.id+1,last-1,1).getDisplayValues();let target=-1;for(let i=0;i<ids.length;i++){if(String(ids[i][0]).trim()===id){target=i+2;break;}}if(target<0)throw new Error('Product not found: '+id);
+  const range=sheet.getRange(target,1,1,info.headers.length),row=range.getValues()[0];
+  Object.keys(p).forEach(k=>{const key=String(k).toLowerCase();if(key==='action'||key==='id')return;if(info.idx[key]!==undefined)row[info.idx[key]]=p[k];});
+  row[info.idx.id]=id;fillBrandLogo_(row,info,p);range.setValues([row]);SpreadsheetApp.flush();return json_({success:true,action:'update',id,row:target});
 }
 
-function json_(obj){
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
-}
+function json_(obj){return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);}
